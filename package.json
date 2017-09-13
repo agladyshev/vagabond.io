@@ -1,0 +1,23 @@
+{
+  "name": "vagabond.io",
+  "version": "1.0.0",
+  "description": "Tourist map w/ markers, filters and directions. Built with Foursquare and Google Maps APIs.",
+  "main": "js/app.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agladyshev/vagabond.io.git"
+  },
+  "author": "Alexey Gladyshev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/agladyshev/vagabond.io/issues"
+  },
+  "homepage": "https://github.com/agladyshev/vagabond.io#readme",
+  "devDependencies": {
+    "connect": "^3.6.3",
+    "server-static": "^2.0.5"
+  }
+}
