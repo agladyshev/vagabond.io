@@ -1,0 +1,49 @@
+html, body, main {
+	height: 100%;
+}
+
+body {
+	overflow: hidden;
+}
+
+.map, .off-canvas-wrapper {
+	height: 100%;
+}
+
+.list-locations {
+	font-size: 14px;
+}
+
+.grid-container {
+  padding: 0;
+}
+
+.top-bar-left, .top-bar-right {
+  padding-bottom: 0.5rem;
+}
+
+.input-group {
+	height: 2rem;
+}
+
+.top-bar input {
+	margin-right: 0;
+	max-width: none;
+}
+
+.button-group, .input-group {
+	margin-bottom: 0.4rem;
+}
+
+.position-bottom {
+	height: auto;
+}
+
+.menu {
+	font-size: 12px;
+}
+
+/*.dropdown, .is-dropdown-submenu, .is-submenu-item, .is-dropdown-submenu>li {
+	min-width: 6rem;
+	width: 9rem;
+}*/
