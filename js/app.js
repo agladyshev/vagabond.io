@@ -12,8 +12,20 @@ var initialLists = [
 var List = function(data) {
 	this.title = ko.observable(data.title);
 	this.id = ko.observable(data.id);
-	this.categories = ko.observableArray([]);
 	this.locations = ko.observableArray([]);
+	this.categories = ko.computed(function() {
+		var list = [];
+		var index = [];
+		this.locations().forEach(function(location) {
+			location.categories().forEach(function(category) {
+				if (index.indexOf(category.id()) === - 1) {
+					list.push(category);
+					index.push(category.id());
+				}		
+			});
+		});
+		return list;
+	}, this);
 };
 
 
@@ -33,29 +45,26 @@ var Location = function(data) {
 	this.rating = ko.observable(data.rating);
 	this.lat = ko.observable(data.location.lat);
 	this.lng = ko.observable(data.location.lng);
-	// this.categoryIDs = ko.observable([data.categories]);
 	this.categories = ko.computed(function() {
 		var categories = [];
 		data.categories.forEach(function (category) {
 			categories.push( new Category(category))
 		});
-		console.log(categories);
 		return categories;
-	});
-	// this.categories = ko.computed(function(data.categories) {
-	// 	var catList = [];
-	// 	var allCategories = ViewModel.getCategories();
-	// 	data.categories.forEach(function(category) {
-	// 		catList.push(allCategories.filter)
-
-	// 	});
-	// 	return catList;
-	// };)
+	}, this);
 };
 
 
 var ViewModel = function() {
 	var self = this;
+
+	this.travelModes = ko.observableArray([
+		{title: "Walking"},
+		{title: "Driving"},
+		{title: "Transit"},
+		{title: "Cycling"}
+	]);
+	this.currentTravelMode = ko.observable( this.travelModes()[0] );
 
 	this.lists = ko.observableArray([]);
 
@@ -65,38 +74,11 @@ var ViewModel = function() {
 
 	this.currentList = ko.observable( this.lists()[0] );
 
-	self.currentCategories = ko.observableArray([]);
-	// self.activeCategories = ko.observableArray([]);
+	// self.currentCategories = ko.observableArray([]);
+	self.currentCategories = ko.computed(function() {
+		return self.currentList().categories();
+	}, this);
 	
-	this.travelModes = ko.observableArray([
-		{title: "Walking"},
-		{title: "Driving"},
-		{title: "Transit"},
-		{title: "Cycling"}
-	]);
-	this.currentTravelMode = ko.observable( this.travelModes()[0] );
-
-	this.lists().forEach(function(list, index) {
-
-		$.getJSON("https://api.foursquare.com/v2/lists/"
-				+ list.id() + "?client_id=" + FOURSQUARE_CLIENT_KEY
-				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
-				+ "&v=20170913", function(data) {
-
-					data.response.list.categories.items.forEach(function (categories) {
-						self.lists()[index].categories.push( new Category(categories.category) );
-					});	
-					data.response.list.listItems.items.forEach(function (location) {
-						list.locations.push( new Location(location.venue) );
-					});
-					self.currentCategories(self.currentList().categories());
-					// self.activeCategories(self.currentCategories());
-
-				});	
-			
-		});
-
-
 	this.activeCategories = ko.computed(function() {
 		var activeCategories = [];
 		self.currentList().categories().forEach(function(category) {
@@ -105,12 +87,14 @@ var ViewModel = function() {
 			};
 		});
 		return activeCategories;	
-	});
-
+	}, this);
 
 	this.activeLocations = ko.computed(function() {
 		var activeLocations = [];
+
 		self.currentList().locations().forEach(function(location) {
+			console.log(location.categories());
+			console.log(self.currentCategories());
 			location.categories().forEach(function(locationCat) {
 				self.activeCategories().forEach(function(category) {
 					if (category.id() === locationCat.id()) {
@@ -120,13 +104,27 @@ var ViewModel = function() {
 			});
 		});
 		return activeLocations;
-	});
+	}, this);
 
+	this.lists().forEach(function(list, index) {
+		$.getJSON("https://api.foursquare.com/v2/lists/"
+				+ list.id() + "?client_id=" + FOURSQUARE_CLIENT_KEY
+				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
+				+ "&v=20170913", function(data) {
+					// data.response.list.categories.items.forEach(function (categories) {
+					// 	self.lists()[index].categories.push( new Category(categories.category) );
+					// });	
+					data.response.list.listItems.items.forEach(function (location) {
+						list.locations.push( new Location(location.venue) );
+					});
+					// self.currentCategories(self.currentList().categories());
+				});	
+			
+		});
 
 	this.setCurrentList = function (list) {
 		self.currentList(list);
-		self.currentCategories(self.currentList().categories());
-		// self.activeCategories(self.currentCategories());
+		// self.currentCategories(self.currentList().categories());
 	};
 
 	this.setTravelMode = function (mode) {
@@ -146,9 +144,6 @@ var ViewModel = function() {
 	this.search = function(form) {
 		console.log(form);
 	}
-
-
-
 };
 
 
