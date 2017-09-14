@@ -43,6 +43,11 @@ body {
 	font-size: 12px;
 }
 
+.list-locations {
+	max-height: 10rem;
+	overflow-y: scroll;
+}
+
 /*.dropdown, .is-dropdown-submenu, .is-submenu-item, .is-dropdown-submenu>li {
 	min-width: 6rem;
 	width: 9rem;

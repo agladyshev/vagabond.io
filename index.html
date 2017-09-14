@@ -52,9 +52,9 @@
                 </ul>
 
               </div>
-              <div class="small-auto medium-shrink cell small-order-3 medium-order-1">
-                <div class="button-group small align-center" data-bind="foreach: currentCategories()">
-                  <a class="button" data-bind="text: $data"></a>
+              <div class="small-auto  cell small-order-3 medium-order-1">
+                <div class="button-group small align-center grid-x" data-bind="foreach: currentCategories">
+                  <a class="button cell shrink" data-bind="text: $data.pluralName()"></a>
                 </div>
               </div>
               <div class="small-auto medium-shrink cell small-order-2 medium-order-3">
@@ -66,13 +66,13 @@
                 </div>
               </div>
               <div class="small-auto cell small-order-4 text-center">
-                <div class="label fi-arrow-down"> List locations</div>
+                <div class="label fi-arrow-down" data-bind="click: toggleListLocations"> List locations</div>
               </div>
-              <div class="list-locations small-order-5 cell">
-                <ul class="list-location no-bullet">
+              <div class="list-locations small-order-5 cell" data-bind="visible: shouldListLocations">
+                <ul class="no-bullet" data-bind="foreach: currentList().locations()">
                   <li class="grid-x">
-                    <a class="title auto cell fi-map"> Starbucks</a>
-                    <span class="auto cell text-right">1.6km/15min</span>
+                    <div class="auto cell"><a class="title fi-map" data-bind="text: ' ' + $data.name()"></a></div>
+                    <div class="shrink cell text-right">1.6km/15min</div>
                   </li>
                 </ul>
               </div>

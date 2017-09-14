@@ -56,51 +56,37 @@ var ViewModel = function() {
 
 	this.currentList = ko.observable( this.lists()[0] );
 
-	// console.log(this.currentList().categories());
+	self.currentCategories = ko.observableArray([]);
 
-	this.currentCategories = ko.observable( this.currentList().categories() );
-
-	console.log(this.lists());
-
-
-
-
-
-	// this.getCategories = function () {
-	// 	return self.currentList().categories();
-	// };
-	// console.log(this.getCategories());
-
-
-	this.lists().forEach(function(list) {
+	this.lists().forEach(function(list, index) {
 
 		$.getJSON("https://api.foursquare.com/v2/lists/"
 				+ list.id() + "?client_id=" + FOURSQUARE_CLIENT_KEY
 				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
 				+ "&v=20170913", function(data) {
-					// console.log(data.response.list.categories);
-					// console.log(list.categories());
+
 					data.response.list.categories.items.forEach(function (category) {
-						list.categories.push( new Category(category) );
+						self.lists()[index].categories.push( new Category(category.category) );
 					});	
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
 					});
-					// console.log(list.categories());
-					// console.log(list.locations());
+					self.currentCategories(self.currentList().categories());
+
 				});	
 			
 		});
 
 	this.setCurrentList = function (list) {
 	    self.currentList(list);
+	    self.currentCategories(self.currentList().categories());
 	};
 
-	console.log(this.currentCategories());
+	this.shouldListLocations = ko.observable(false);
 
-	this.currentCategories().forEach(function(category) {
-		console.log(category);
-	});
+	this.toggleListLocations = function() {
+		self.shouldListLocations(!self.shouldListLocations());
+	};
 
 
 };
