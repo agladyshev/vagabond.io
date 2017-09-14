@@ -54,7 +54,7 @@
               </div>
               <div class="small-auto  cell small-order-3 medium-order-1">
                 <div class="button-group small align-center grid-x" data-bind="foreach: currentCategories">
-                  <a class="button cell shrink" data-bind="text: $data.pluralName()"></a>
+                  <a class="button cell shrink" data-bind="text: $data.pluralName(), click: $parent.toggleCategory, css: { hollow: !$data.active() }"></a>
                 </div>
               </div>
               <div class="small-auto medium-shrink cell small-order-2 medium-order-3">

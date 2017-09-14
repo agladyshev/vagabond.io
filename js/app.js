@@ -22,6 +22,7 @@ var Category = function(data) {
 	this.name = ko.observable(data.name);
 	this.pluralName = ko.observable(data.pluralName);
 	this.shortName = ko.observable(data.shortName);
+	this.active = ko.observable(true);
 };
 
 
@@ -57,6 +58,8 @@ var ViewModel = function() {
 	this.currentList = ko.observable( this.lists()[0] );
 
 	self.currentCategories = ko.observableArray([]);
+	// self.activeCategories = ko.observableArray([]);
+
 
 	this.lists().forEach(function(list, index) {
 
@@ -72,6 +75,7 @@ var ViewModel = function() {
 						list.locations.push( new Location(location.venue) );
 					});
 					self.currentCategories(self.currentList().categories());
+					// self.activeCategories(self.currentCategories());
 
 				});	
 			
@@ -80,6 +84,7 @@ var ViewModel = function() {
 	this.setCurrentList = function (list) {
 	    self.currentList(list);
 	    self.currentCategories(self.currentList().categories());
+	    // self.activeCategories(self.currentCategories());
 	};
 
 	this.shouldListLocations = ko.observable(false);
@@ -87,6 +92,17 @@ var ViewModel = function() {
 	this.toggleListLocations = function() {
 		self.shouldListLocations(!self.shouldListLocations());
 	};
+
+	this.toggleCategory = function(category) {
+		console.log(category.active());
+		category.active(!category.active());
+		console.log(category.active());
+		// self.activeCategories.pop(category);
+	};
+
+	this.isActiveCategory = function(category) {
+		return 
+	}
 
 
 };
