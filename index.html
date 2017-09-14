@@ -33,10 +33,9 @@
 
                 <ul class="dropdown menu shrink cell" data-dropdown-menu>
                   <li>
-                    <a>Erevan</a>
-                    <ul class="menu nested">
-                      <li><a>Erevan</a></li>
-                      <li><a>Armenia</a></li>
+                    <a data-bind="text: currentList().title"></a>
+                    <ul class="menu nested" data-bind="foreach: lists">
+                      <li><a data-bind="text: title, click: $parent.setCurrentList"></a></li>
                     </ul>
                   </li>
                 </ul>
@@ -54,11 +53,8 @@
 
               </div>
               <div class="small-auto medium-shrink cell small-order-3 medium-order-1">
-                <div class="button-group small align-center">
-                  <a class="button">Coffee</a>
-                  <a class="button">Food</a>
-                  <a class="button">Sights</a>
-                  <a class="button">Museums</a>
+                <div class="button-group small align-center" data-bind="foreach: currentCategories()">
+                  <a class="button" data-bind="text: $data"></a>
                 </div>
               </div>
               <div class="small-auto medium-shrink cell small-order-2 medium-order-3">
@@ -103,6 +99,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/what-input/5.0.1/what-input.min.js"></script>   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="js/foundation/foundation.min.js"></script>
+    <script src="js/keys.js"></script>
     <script src="js/app.js"></script>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7RnGX171scgI56S88ugzd-VXRc1J78-I&v=3&v=3&callback=initMap">
