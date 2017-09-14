@@ -44,7 +44,7 @@ body {
 }
 
 .list-locations {
-	max-height: 10rem;
+	max-height: 30vh;
 	overflow-y: scroll;
 }
 

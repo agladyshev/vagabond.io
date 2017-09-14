@@ -33,8 +33,16 @@ var Location = function(data) {
 	this.rating = ko.observable(data.rating);
 	this.lat = ko.observable(data.location.lat);
 	this.lng = ko.observable(data.location.lng);
-	this.categoryIDs = ko.observableArray([data.categories]);
-	// this.categories = ko.observableArray(function(data.categories) {
+	// this.categoryIDs = ko.observable([data.categories]);
+	this.categories = ko.computed(function() {
+		var categories = [];
+		data.categories.forEach(function (category) {
+			categories.push( new Category(category))
+		});
+		console.log(categories);
+		return categories;
+	});
+	// this.categories = ko.computed(function(data.categories) {
 	// 	var catList = [];
 	// 	var allCategories = ViewModel.getCategories();
 	// 	data.categories.forEach(function(category) {
@@ -75,8 +83,8 @@ var ViewModel = function() {
 				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
 				+ "&v=20170913", function(data) {
 
-					data.response.list.categories.items.forEach(function (category) {
-						self.lists()[index].categories.push( new Category(category.category) );
+					data.response.list.categories.items.forEach(function (categories) {
+						self.lists()[index].categories.push( new Category(categories.category) );
 					});	
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
@@ -88,6 +96,33 @@ var ViewModel = function() {
 			
 		});
 
+
+	this.activeCategories = ko.computed(function() {
+		var activeCategories = [];
+		self.currentList().categories().forEach(function(category) {
+			if (category.active()) {
+				activeCategories.push(category);
+			};
+		});
+		return activeCategories;	
+	});
+
+
+	this.activeLocations = ko.computed(function() {
+		var activeLocations = [];
+		self.currentList().locations().forEach(function(location) {
+			location.categories().forEach(function(locationCat) {
+				self.activeCategories().forEach(function(category) {
+					if (category.id() === locationCat.id()) {
+						activeLocations.push(location);
+					};
+				});
+			});
+		});
+		return activeLocations;
+	});
+
+
 	this.setCurrentList = function (list) {
 		self.currentList(list);
 		self.currentCategories(self.currentList().categories());
@@ -95,7 +130,7 @@ var ViewModel = function() {
 	};
 
 	this.setTravelMode = function (mode) {
-	    self.currentTravelMode(mode);
+		self.currentTravelMode(mode);
 	};
 	
 	this.shouldListLocations = ko.observable(false);
@@ -108,10 +143,10 @@ var ViewModel = function() {
 		category.active(!category.active());
 		// self.activeCategories.pop(category);
 	};
-
-	this.isActiveCategory = function(category) {
-		return 
+	this.search = function(form) {
+		console.log(form);
 	}
+
 
 
 };

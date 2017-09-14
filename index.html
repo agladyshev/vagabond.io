@@ -51,23 +51,23 @@
 
               </div>
               <div class="small-auto  cell small-order-3 medium-order-1">
-                <div class="button-group small align-center grid-x" data-bind="foreach: currentCategories">
+                <div class="button-group tiny align-center grid-x" data-bind="foreach: currentCategories">
                   <a class="button cell shrink" data-bind="text: $data.pluralName(), click: $parent.toggleCategory, css: { hollow: !$data.active() }"></a>
                 </div>
               </div>
               <div class="small-auto medium-shrink cell small-order-2 medium-order-3">
-                <div class="input-group align-center">
+                <form class="input-group align-center" data-bind="submit: search">
                   <input class="input-group-field" type="text">
                   <div class="input-group-button">
                     <input type="submit" class="button small" value="Search">
                   </div>
-                </div>
+                </form>
               </div>
               <div class="small-auto cell small-order-4 text-center">
                 <div class="label fi-arrow-down" data-bind="click: toggleListLocations"> List locations</div>
               </div>
               <div class="list-locations small-order-5 cell" data-bind="visible: shouldListLocations">
-                <ul class="no-bullet" data-bind="foreach: currentList().locations()">
+                <ul class="no-bullet" data-bind="foreach: activeLocations()">
                   <li class="grid-x">
                     <div class="auto cell"><a class="title fi-map" data-bind="text: ' ' + $data.name()"></a></div>
                     <div class="shrink cell text-right">1.6km/15min</div>
