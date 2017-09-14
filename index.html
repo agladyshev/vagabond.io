@@ -42,11 +42,9 @@
 
                 <ul class="dropdown menu shrink cell" data-dropdown-menu>
                   <li>
-                    <a>Transit</a>
-                    <ul class="menu nested">
-                      <li ><a>Foot</a></li>
-                      <li><a>Car</a></li>
-                      <li><a>Transit</a></li>
+                    <a data-bind="text: currentTravelMode().title"></a>
+                    <ul class="menu nested" data-bind="foreach: travelModes">
+                      <li><a data-bind="text: title, click: $parent.setTravelMode"></a></li>
                     </ul>
                   </li>
                 </ul>

@@ -59,7 +59,14 @@ var ViewModel = function() {
 
 	self.currentCategories = ko.observableArray([]);
 	// self.activeCategories = ko.observableArray([]);
-
+	
+	this.travelModes = ko.observableArray([
+		{title: "Walking"},
+		{title: "Driving"},
+		{title: "Transit"},
+		{title: "Cycling"}
+	]);
+	this.currentTravelMode = ko.observable( this.travelModes()[0] );
 
 	this.lists().forEach(function(list, index) {
 
@@ -82,11 +89,15 @@ var ViewModel = function() {
 		});
 
 	this.setCurrentList = function (list) {
-	    self.currentList(list);
-	    self.currentCategories(self.currentList().categories());
-	    // self.activeCategories(self.currentCategories());
+		self.currentList(list);
+		self.currentCategories(self.currentList().categories());
+		// self.activeCategories(self.currentCategories());
 	};
 
+	this.setTravelMode = function (mode) {
+	    self.currentTravelMode(mode);
+	};
+	
 	this.shouldListLocations = ko.observable(false);
 
 	this.toggleListLocations = function() {
@@ -94,9 +105,7 @@ var ViewModel = function() {
 	};
 
 	this.toggleCategory = function(category) {
-		console.log(category.active());
 		category.active(!category.active());
-		console.log(category.active());
 		// self.activeCategories.pop(category);
 	};
 
