@@ -74,7 +74,6 @@ var ViewModel = function() {
 
 	this.currentList = ko.observable( this.lists()[0] );
 
-	// self.currentCategories = ko.observableArray([]);
 	self.currentCategories = ko.computed(function() {
 		return self.currentList().categories();
 	}, this);
@@ -93,8 +92,7 @@ var ViewModel = function() {
 		var activeLocations = [];
 
 		self.currentList().locations().forEach(function(location) {
-			console.log(location.categories());
-			console.log(self.currentCategories());
+
 			location.categories().forEach(function(locationCat) {
 				self.activeCategories().forEach(function(category) {
 					if (category.id() === locationCat.id()) {
@@ -111,20 +109,14 @@ var ViewModel = function() {
 				+ list.id() + "?client_id=" + FOURSQUARE_CLIENT_KEY
 				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
 				+ "&v=20170913", function(data) {
-					// data.response.list.categories.items.forEach(function (categories) {
-					// 	self.lists()[index].categories.push( new Category(categories.category) );
-					// });	
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
 					});
-					// self.currentCategories(self.currentList().categories());
 				});	
-			
 		});
 
 	this.setCurrentList = function (list) {
 		self.currentList(list);
-		// self.currentCategories(self.currentList().categories());
 	};
 
 	this.setTravelMode = function (mode) {
