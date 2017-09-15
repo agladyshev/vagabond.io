@@ -39,12 +39,12 @@ var Category = function(data) {
 
 
 var Location = function(data) {
+	var self = this;
 	this.id = data.id;
 	this.name = data.name;
 	this.phone = data.contact.phone;
 	this.rating = data.rating;
-	this.lat = data.location.lat;
-	this.lng = data.location.lng;
+	this.LatLng = {lat: data.location.lat, lng: data.location.lng};
 	this.categories = ko.computed(function() {
 		var categories = [];
 		data.categories.forEach(function (category) {
@@ -52,6 +52,12 @@ var Location = function(data) {
 		});
 		return categories;
 	}, this);
+	self.marker = new google.maps.Marker({
+        // icon: image,
+        position: self.LatLng,
+        // animation: google.maps.Animation.DROP
+    });
+    // self.marker.addListener('click', toggleBounce);
 };
 
 
@@ -92,11 +98,12 @@ var ViewModel = function() {
 		var activeLocations = [];
 
 		self.currentList().locations().forEach(function(location) {
-
+			location.marker.setMap(null);
 			location.categories().forEach(function(locationCat) {
 				self.activeCategories().forEach(function(category) {
 					if (category.id === locationCat.id) {
 						activeLocations.push(location);
+						location.marker.setMap(map);
 					};
 				});
 			});
@@ -135,7 +142,15 @@ var ViewModel = function() {
 	};
 	this.search = function(form) {
 		console.log(form);
-	}
+	};
+
+	// this.addMarkers = function() {
+	// 	self.currentList.locations().forEach(function(location) {
+	// 		location.marker.setMap(map);
+	// 	});
+	// };
+
+	// this.addMarkers();
 };
 
 

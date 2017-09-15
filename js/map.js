@@ -1,11 +1,15 @@
+var map;
+
 var viewMap = {
 	init: function() {
-		var map;
+		
 		map = new google.maps.Map(document.getElementById('map'), {
-			center: {lat: 40.7413549, lng: -73.9980244},
+			center: {lat: 40.179186, lng: 44.499103},
 			zoom: 12,
 			disableDefaultUI: true
+
 		});
+		window.mapBounds = new google.maps.LatLngBounds();
 	}
 };
 
