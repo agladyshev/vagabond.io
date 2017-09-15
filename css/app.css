@@ -1,17 +1,17 @@
 html, body, main {
-	height: 100%;
+  height: 100%;
 }
 
 body {
-	overflow: hidden;
+  overflow: hidden;
 }
 
 .map, .off-canvas-wrapper {
-	height: 100%;
+  height: 100%;
 }
 
 .list-locations {
-	font-size: 14px;
+  font-size: 14px;
 }
 
 .grid-container {
@@ -23,37 +23,47 @@ body {
 }
 
 .input-group {
-	height: 2rem;
+  height: 2rem;
 }
 
 .top-bar input {
-	margin-right: 0;
-	max-width: none;
+  margin-right: 0;
+  max-width: none;
 }
 
 .button-group, .input-group {
-	margin-bottom: 0.4rem;
+  margin-bottom: 0.4rem;
 }
 
 .position-bottom {
-	height: auto;
+  height: auto;
 }
 
 .menu {
-	font-size: 12px;
+  font-size: 12px;
 }
 
 .list-locations {
-	max-height: 30vh;
-	overflow-y: scroll;
+  max-height: 30vh;
+  overflow-y: scroll;
 }
 
-.gm-style-iw {
-	width: auto;
-	max-width: 50vw;
-}
+  @media screen and (max-width: 40em) {
 
-/*.dropdown, .is-dropdown-submenu, .is-submenu-item, .is-dropdown-submenu>li {
-	min-width: 6rem;
-	width: 9rem;
-}*/
+
+    .infowindow {
+      width: 80vw;
+    }
+    .infowindow-streetview {
+      height: 30vh;
+    } 
+  }
+  @media screen and (min-width: 40em) {
+
+    .infowindow {
+      width: 30rem;
+    }
+    .infowindow-streetview {
+      height: 25rem;
+    } 
+  }

@@ -112,55 +112,69 @@ var viewMap = {
 			infowindow.close();
 		};
 
-		// var streetViewService = new google.maps.StreetViewService();
-		// var radius = 50;
-		// // In case the status is OK, which means the pano was found, compute the
-		// // position of the streetview image, then calculate the heading, then get a
-		// // panorama from that and set the options
-		// function getStreetView(location, status) {
-		//   if (status == google.maps.StreetViewStatus.OK) {
-		//     var nearStreetViewLocation = location.latLng;
-		//     var heading = google.maps.geometry.spherical.computeHeading(
-		//       nearStreetViewLocation, marker.position);
-		//       infowindow.setContent('<div>' + marker.title + '</div><div id="pano"></div>');
-		//       var panoramaOptions = {
-		//         position: nearStreetViewLocation,
-		//         pov: {
-		//           heading: heading,
-		//           pitch: 30
-		//         }
-		//       };
-		//     var panorama = new google.maps.StreetViewPanorama(
-		//       document.getElementById('pano'), panoramaOptions);
-		//   } else {
-		//     infowindow.setContent('<div>' + marker.title + '</div>' +
-		//       '<div>No Street View Found</div>');
-		//   }
-		// }
-		// // Use streetview service to get the closest streetview image within
-		// // 50 meters of the markers position
-		// streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+		var streetViewService = new google.maps.StreetViewService();
+		var radius = 50;
+
+		function getStreetView(data, status) {
+			if (status == google.maps.StreetViewStatus.OK) {
+				console.log(location.marker.position);
+				console.log(data.location.latLng);
+				var nearStreetViewLocation = data.location.latLng;
+				var heading = google.maps.geometry.spherical.computeHeading(
+					nearStreetViewLocation, location.marker.position);
+					
+				var panoramaOptions = {
+					position: nearStreetViewLocation,
+					pov: {
+						heading: heading,
+						pitch: 30
+					}
+				};
+
+				var panorama = new google.maps.StreetViewPanorama(
+					document.getElementById('pano'), panoramaOptions);
+				
+			} else {
+				document.getElementById('pano').classList.toggle("infowindow-streetview");
+			};
+		};
 
 
 		this.infoDiv = function(location) {
+			
+
 			var div = '<div class="grid-container infowindow"><div class="grid-x">' +
 				'<div class="cell grid-x">' +
-				'<div class="cell auto">' + location.name + '</div>' +
-				'<div class="cell shrink text-right"><span class="badge">' + location.rating + '</span></div>' +
-				'</div><div class="cell shrink grid-x">';
+				'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
+				'<div class="cell small-2 text-right">' +
+				( location.rating? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div>' +
+				'</div><div class="cell grid-x button-group tiny">';
+
 			location.categories().forEach(function(category) {
-				div += '<div class="cell label shrink">' + category.shortName + '</div>'
+				div += '<div class="cell button shrink">' + category.shortName + '</div>'
 			});
-			div += '</div><div class="cell">' + (location.phone? location.phone : '')  + '</div></div>'
+
+			div += (location.phone? '<div class="cell shrink button fi-telephone"> ' + location.phone + '</div>': '') +
+				'</div><div class="cell infowindow-streetview" id="pano"></div></div>'
 
 			return div;
 		};
+
 		console.log(this.infoDiv(location));
 		infowindow = new google.maps.InfoWindow({
 			content: this.infoDiv(location)
 		  });
+		
+
+		streetViewService.getPanoramaByLocation(location.marker.position, radius, getStreetView);
+
 		infowindow.open(map, location.marker);
 	},
+	closeInfoWindow: function() {
+		if (infowindow) {
+			infowindow.close();
+		};
+	}
 };
 
 var initMap = function() {
