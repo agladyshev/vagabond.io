@@ -48,6 +48,11 @@ body {
 	overflow-y: scroll;
 }
 
+.gm-style-iw {
+	width: auto;
+	max-width: 50vw;
+}
+
 /*.dropdown, .is-dropdown-submenu, .is-submenu-item, .is-dropdown-submenu>li {
 	min-width: 6rem;
 	width: 9rem;

@@ -111,9 +111,53 @@ var viewMap = {
 		if (infowindow) {
 			infowindow.close();
 		};
-		var infoDiv = '<div>' + location.name +'</div>';
+
+		// var streetViewService = new google.maps.StreetViewService();
+		// var radius = 50;
+		// // In case the status is OK, which means the pano was found, compute the
+		// // position of the streetview image, then calculate the heading, then get a
+		// // panorama from that and set the options
+		// function getStreetView(location, status) {
+		//   if (status == google.maps.StreetViewStatus.OK) {
+		//     var nearStreetViewLocation = location.latLng;
+		//     var heading = google.maps.geometry.spherical.computeHeading(
+		//       nearStreetViewLocation, marker.position);
+		//       infowindow.setContent('<div>' + marker.title + '</div><div id="pano"></div>');
+		//       var panoramaOptions = {
+		//         position: nearStreetViewLocation,
+		//         pov: {
+		//           heading: heading,
+		//           pitch: 30
+		//         }
+		//       };
+		//     var panorama = new google.maps.StreetViewPanorama(
+		//       document.getElementById('pano'), panoramaOptions);
+		//   } else {
+		//     infowindow.setContent('<div>' + marker.title + '</div>' +
+		//       '<div>No Street View Found</div>');
+		//   }
+		// }
+		// // Use streetview service to get the closest streetview image within
+		// // 50 meters of the markers position
+		// streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+
+
+		this.infoDiv = function(location) {
+			var div = '<div class="grid-container infowindow"><div class="grid-x">' +
+				'<div class="cell grid-x">' +
+				'<div class="cell auto">' + location.name + '</div>' +
+				'<div class="cell shrink text-right"><span class="badge">' + location.rating + '</span></div>' +
+				'</div><div class="cell shrink grid-x">';
+			location.categories().forEach(function(category) {
+				div += '<div class="cell label shrink">' + category.shortName + '</div>'
+			});
+			div += '</div><div class="cell">' + (location.phone? location.phone : '')  + '</div></div>'
+
+			return div;
+		};
+		console.log(this.infoDiv(location));
 		infowindow = new google.maps.InfoWindow({
-			content: infoDiv
+			content: this.infoDiv(location)
 		  });
 		infowindow.open(map, location.marker);
 	},
