@@ -97,7 +97,7 @@ var ViewModel = function() {
 
 	this.activeLocations = ko.computed(function() {
 		var activeLocations = [];
-
+		var positions = [];
 		self.currentList().locations().forEach(function(location) {
 			location.marker.setMap(null);
 			location.categories().forEach(function(locationCat) {
@@ -105,18 +105,13 @@ var ViewModel = function() {
 					if (category.id === locationCat.id) {
 						activeLocations.push(location);
 						location.marker.setMap(map);
-						bounds.extend(location.marker.getPosition());
+						positions.push(location.marker.getPosition());
 					};
-
 				});
-
 			});
-
 		});
 		if (typeof bounds !== 'undefined') {
-			
-			map.fitBounds(bounds);
-			// map.setCenter(bounds.getCenter());
+			viewMap.fitBounds(positions);
 		};
 		return activeLocations;
 	}, this);
@@ -161,19 +156,6 @@ var ViewModel = function() {
 	this.search = function(form) {
 		console.log(form);
 	};
-	
-	// this.fitBounds = function(bounds) {
-	// 	console.log(bounds);
-	// 	map.fitBounds(bounds);
-	// };
-
-	// this.addMarkers = function() {
-	// 	self.currentList.locations().forEach(function(location) {
-	// 		location.marker.setMap(map);
-	// 	});
-	// };
-
-	// this.addMarkers();
 };
 
 

@@ -10,12 +10,19 @@ var viewMap = {
 			disableDefaultUI: true
 
 		});
+		this.resetBounds();
+	},
 
-		bounds = new google.maps.LatLngBounds();
-		// console.log(bounds);
-	},	
 	resetBounds: function() {
+		console.log("reset");
 		bounds = new google.maps.LatLngBounds();
+	},
+	fitBounds: function(positions) {
+		this.resetBounds();
+		positions.forEach(function(position) {
+			bounds.extend(position);
+		});
+		map.fitBounds(bounds);
 	}
 };
 
