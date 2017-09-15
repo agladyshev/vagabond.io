@@ -1,5 +1,6 @@
 var map;
 var bounds;
+var infowindow;
 
 var viewMap = {
 	init: function() {
@@ -12,9 +13,7 @@ var viewMap = {
 		});
 		this.resetBounds();
 	},
-
 	resetBounds: function() {
-		console.log("reset");
 		bounds = new google.maps.LatLngBounds();
 	},
 	fitBounds: function(positions) {
@@ -23,7 +22,17 @@ var viewMap = {
 			bounds.extend(position);
 		});
 		map.fitBounds(bounds);
-	}
+	},
+	openInfoWindow: function(location) {
+		if (infowindow) {
+			infowindow.close();
+		};
+		var infoDiv = '<div>' + location.name +'</div>';
+		infowindow = new google.maps.InfoWindow({
+		    content: infoDiv
+		  });
+		infowindow.open(map, location.marker);
+	},
 };
 
 var initMap = function() {

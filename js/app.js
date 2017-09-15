@@ -57,6 +57,9 @@ var Location = function(data) {
         position: self.LatLng,
         // animation: google.maps.Animation.DROP
     });
+    self.marker.addListener('click', function() {
+    	viewMap.openInfoWindow(self);
+    });
     // self.marker.addListener('click', toggleBounce);
 };
 
