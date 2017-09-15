@@ -62,6 +62,7 @@ var Location = function(data) {
 
 
 var ViewModel = function() {
+	// console.log(map);
 	var self = this;
 
 	this.travelModes = ko.observableArray([
@@ -104,10 +105,19 @@ var ViewModel = function() {
 					if (category.id === locationCat.id) {
 						activeLocations.push(location);
 						location.marker.setMap(map);
+						bounds.extend(location.marker.getPosition());
 					};
+
 				});
+
 			});
+
 		});
+		if (typeof bounds !== 'undefined') {
+			
+			map.fitBounds(bounds);
+			// map.setCenter(bounds.getCenter());
+		};
 		return activeLocations;
 	}, this);
 
@@ -123,7 +133,15 @@ var ViewModel = function() {
 		});
 
 	this.setCurrentList = function (list) {
+		self.hideMarkers();
 		self.currentList(list);
+	};
+
+	this.hideMarkers = function () {
+		self.currentList().locations().forEach(function(location) {
+			location.marker.setMap(null);
+		});
+		viewMap.resetBounds();
 	};
 
 	this.setTravelMode = function (mode) {
@@ -143,6 +161,11 @@ var ViewModel = function() {
 	this.search = function(form) {
 		console.log(form);
 	};
+	
+	// this.fitBounds = function(bounds) {
+	// 	console.log(bounds);
+	// 	map.fitBounds(bounds);
+	// };
 
 	// this.addMarkers = function() {
 	// 	self.currentList.locations().forEach(function(location) {

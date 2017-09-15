@@ -1,4 +1,5 @@
 var map;
+var bounds;
 
 var viewMap = {
 	init: function() {
@@ -9,7 +10,12 @@ var viewMap = {
 			disableDefaultUI: true
 
 		});
-		window.mapBounds = new google.maps.LatLngBounds();
+
+		bounds = new google.maps.LatLngBounds();
+		// console.log(bounds);
+	},	
+	resetBounds: function() {
+		bounds = new google.maps.LatLngBounds();
 	}
 };
 
