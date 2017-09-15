@@ -10,17 +10,17 @@ var initialLists = [
 
 
 var List = function(data) {
-	this.title = ko.observable(data.title);
-	this.id = ko.observable(data.id);
+	this.title = data.title;
+	this.id = data.id;
 	this.locations = ko.observableArray([]);
 	this.categories = ko.computed(function() {
 		var list = [];
 		var index = [];
 		this.locations().forEach(function(location) {
 			location.categories().forEach(function(category) {
-				if (index.indexOf(category.id()) === - 1) {
+				if (index.indexOf(category.id) === - 1) {
 					list.push(category);
-					index.push(category.id());
+					index.push(category.id);
 				}		
 			});
 		});
@@ -30,21 +30,21 @@ var List = function(data) {
 
 
 var Category = function(data) {
-	this.id = ko.observable(data.id);
-	this.name = ko.observable(data.name);
-	this.pluralName = ko.observable(data.pluralName);
-	this.shortName = ko.observable(data.shortName);
+	this.id = data.id;
+	this.name = data.name;
+	this.pluralName = data.pluralName;
+	this.shortName = data.shortName;
 	this.active = ko.observable(true);
 };
 
 
 var Location = function(data) {
-	this.id = ko.observable(data.id);
-	this.name = ko.observable(data.name);
-	this.phone = ko.observable(data.contact.phone);
-	this.rating = ko.observable(data.rating);
-	this.lat = ko.observable(data.location.lat);
-	this.lng = ko.observable(data.location.lng);
+	this.id = data.id;
+	this.name = data.name;
+	this.phone = data.contact.phone;
+	this.rating = data.rating;
+	this.lat = data.location.lat;
+	this.lng = data.location.lng;
 	this.categories = ko.computed(function() {
 		var categories = [];
 		data.categories.forEach(function (category) {
@@ -95,7 +95,7 @@ var ViewModel = function() {
 
 			location.categories().forEach(function(locationCat) {
 				self.activeCategories().forEach(function(category) {
-					if (category.id() === locationCat.id()) {
+					if (category.id === locationCat.id) {
 						activeLocations.push(location);
 					};
 				});
@@ -106,7 +106,7 @@ var ViewModel = function() {
 
 	this.lists().forEach(function(list, index) {
 		$.getJSON("https://api.foursquare.com/v2/lists/"
-				+ list.id() + "?client_id=" + FOURSQUARE_CLIENT_KEY
+				+ list.id + "?client_id=" + FOURSQUARE_CLIENT_KEY
 				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
 				+ "&v=20170913", function(data) {
 					data.response.list.listItems.items.forEach(function (location) {
