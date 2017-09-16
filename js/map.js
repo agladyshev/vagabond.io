@@ -1,6 +1,7 @@
 var map;
 var bounds;
 var infowindow;
+var geoPosition;
 
 var viewMap = {
 	init: function() {
@@ -85,15 +86,13 @@ var viewMap = {
 					"color": "#dddddd"
 				}
 			]
-		}
-	]
-		
+		}];
+
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: {lat: 40.179186, lng: 44.499103},
 			zoom: 12,
 			styles: styles,
 			disableDefaultUI: true
-
 		});
 		this.resetBounds();
 	},
@@ -108,17 +107,13 @@ var viewMap = {
 		map.fitBounds(bounds);
 	},
 	openInfoWindow: function(location) {
-		if (infowindow) {
-			infowindow.close();
-		};
+		this.closeInfoWindow();
 
 		var streetViewService = new google.maps.StreetViewService();
 		var radius = 50;
 
 		function getStreetView(data, status) {
 			if (status == google.maps.StreetViewStatus.OK) {
-				console.log(location.marker.position);
-				console.log(data.location.latLng);
 				var nearStreetViewLocation = data.location.latLng;
 				var heading = google.maps.geometry.spherical.computeHeading(
 					nearStreetViewLocation, location.marker.position);
@@ -141,26 +136,25 @@ var viewMap = {
 
 
 		this.infoDiv = function(location) {
-			
 
 			var div = '<div class="grid-container infowindow"><div class="grid-x">' +
 				'<div class="cell grid-x">' +
 				'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
 				'<div class="cell small-2 text-right">' +
-				( location.rating? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div>' +
-				'</div><div class="cell grid-x button-group tiny">';
+				( location.rating ? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div></div>' +
+				( location.distance() ? '<div class="cell">' + location.distance() + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
 
 			location.categories().forEach(function(category) {
 				div += '<div class="cell button shrink">' + category.shortName + '</div>'
 			});
 
 			div += (location.phone? '<div class="cell shrink button fi-telephone"> ' + location.phone + '</div>': '') +
-				'</div><div class="cell infowindow-streetview" id="pano"></div></div>'
+				'</div><div class="cell infowindow-streetview" id="pano"></div>' + 
+				'</div>'
 
 			return div;
 		};
 
-		console.log(this.infoDiv(location));
 		infowindow = new google.maps.InfoWindow({
 			content: this.infoDiv(location)
 		  });
@@ -172,11 +166,65 @@ var viewMap = {
 	},
 	closeInfoWindow: function() {
 		if (infowindow) {
+			infowindow.setContent('');
+			infowindow.marker = null;
 			infowindow.close();
 		};
+	},
+	toggleGPS: function() {
+		if (geoPosition) {
+			geoPosition = null;
+		} else {
+			var geoOptions = {
+				enableHighAccuracy: false,
+				timeout: 10 * 1000,
+				maximumAge: 5 * 60 * 1000,
+			}
+			var geoSuccess = function(position) {
+				geoPosition = position;
+				console.log(geoPosition.coords.latitude);
+				console.log(geoPosition.coords.longitude);
+				console.log(geoPosition);
+				viewModel.currentPosition(geoPosition);
+			};
+			var geoError = function(error) {
+				console.log('Error occurred. Error code: ' + error.code);
+				// error.code can be:
+				//   0: unknown error
+				//   1: permission denied
+				//   2: position unavailable (error response from location provider)
+				//   3: timed out
+			};
+			navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
+		};
+	},
+	getDistance: function(location, travelMode) {
+		var result;
+		var distanceMatrixService = new google.maps.DistanceMatrixService;
+		distanceMatrixService.getDistanceMatrix({
+			origins: [{lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude}],
+			destinations: [location.marker.position],
+			travelMode: travelMode,
+			unitSystem: google.maps.UnitSystem.METRIC,
+		}, function(response, status) {
+			if (status !== google.maps.DistanceMatrixStatus.OK) {
+				window.alert('Error was: ' + status);
+			} else {
+				result = response.rows[0].elements[0];
+				if (result.status !== "OK") {
+					viewModel.setDistance(location, 'No route found');
+				} else {
+					var distance = result.distance.text + ' / ' + result.duration.text;
+					viewModel.setDistance(location, distance);
+				};
+			}
+		});
+		
 	}
 };
 
 var initMap = function() {
 	viewMap.init();
 };
+
+

@@ -53,27 +53,31 @@ var Location = function(data) {
 		return categories;
 	}, this);
 	self.marker = new google.maps.Marker({
-        // icon: image,
-        position: self.LatLng,
-        // animation: google.maps.Animation.DROP
-    });
-    self.marker.addListener('click', function() {
-    	viewMap.openInfoWindow(self);
-    });
-    // self.marker.addListener('click', toggleBounce);
+		// icon: image,
+		position: self.LatLng,
+		// animation: google.maps.Animation.DROP
+	});
+	self.marker.addListener('click', function() {
+		viewMap.openInfoWindow(self);
+	});
+	this.distance = ko.observable();
 };
 
 
 var ViewModel = function() {
-	// console.log(map);
 	var self = this;
 
+	this.currentPosition = ko.observable();
+
 	this.travelModes = ko.observableArray([
-		{title: "Walking"},
-		{title: "Driving"},
-		{title: "Transit"},
-		{title: "Cycling"}
-	]);
+			{title: "Walking", mode: "WALKING"},
+			{title: "Driving", mode: "DRIVING"},
+			{title: "Transit", mode: "TRANSIT"},
+			{title: "Cycling", mode: "CYCLING"}
+		]);
+
+	this.gpsStatus = ko.observable(false);
+
 	this.currentTravelMode = ko.observable( this.travelModes()[0] );
 
 	this.lists = ko.observableArray([]);
@@ -119,6 +123,14 @@ var ViewModel = function() {
 		return activeLocations;
 	}, this);
 
+	this.currentPosition.subscribe(function(newPosition) {
+		console.log('here');
+		console.log(self.activeLocations());
+		self.activeLocations().forEach(function(location) {
+			viewMap.getDistance(location, viewModel.currentTravelMode().mode);
+		})
+	});
+
 	this.lists().forEach(function(list, index) {
 		$.getJSON("https://api.foursquare.com/v2/lists/"
 				+ list.id + "?client_id=" + FOURSQUARE_CLIENT_KEY
@@ -154,14 +166,23 @@ var ViewModel = function() {
 
 	this.toggleCategory = function(category) {
 		category.active(!category.active());
-		// self.activeCategories.pop(category);
 	};
 	this.search = function(form) {
 		console.log(form);
 	};
+	this.toggleGPS = function() {
+		self.gpsStatus(!self.gpsStatus());
+		viewMap.toggleGPS();
+	};
+	this.setDistance = function(location, distance) {
+		location.distance(distance);
+	}
+
 };
 
 
-ko.applyBindings(new ViewModel());
+var viewModel = new ViewModel();
+
+ko.applyBindings(viewModel);
 
 $(document).foundation();

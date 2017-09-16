@@ -31,9 +31,13 @@ body {
   max-width: none;
 }
 
-.button-group, .input-group {
+.input-group {
   margin-bottom: 0.4rem;
 }
+/*
+.button {
+  margin-bottom: 0;
+}*/
 
 .position-bottom {
   height: auto;
