@@ -73,7 +73,7 @@ var ViewModel = function() {
 			{title: "Walking", mode: "WALKING"},
 			{title: "Driving", mode: "DRIVING"},
 			{title: "Transit", mode: "TRANSIT"},
-			{title: "Cycling", mode: "CYCLING"}
+			{title: "Cycling", mode: "BICYCLING"}
 		]);
 
 	this.gpsStatus = ko.observable(false);
@@ -124,12 +124,9 @@ var ViewModel = function() {
 	}, this);
 
 	this.currentPosition.subscribe(function(newPosition) {
-		console.log('here');
-		console.log(self.activeLocations());
-		self.activeLocations().forEach(function(location) {
-			viewMap.getDistance(location, viewModel.currentTravelMode().mode);
-		})
+		self.getDistance();
 	});
+
 
 	this.lists().forEach(function(list, index) {
 		$.getJSON("https://api.foursquare.com/v2/lists/"
@@ -145,6 +142,7 @@ var ViewModel = function() {
 	this.setCurrentList = function (list) {
 		self.hideMarkers();
 		self.currentList(list);
+		self.getDistance();
 	};
 
 	this.hideMarkers = function () {
@@ -156,6 +154,7 @@ var ViewModel = function() {
 
 	this.setTravelMode = function (mode) {
 		self.currentTravelMode(mode);
+		self.getDistance();
 	};
 	
 	this.shouldListLocations = ko.observable(false);
@@ -173,6 +172,14 @@ var ViewModel = function() {
 	this.toggleGPS = function() {
 		self.gpsStatus(!self.gpsStatus());
 		viewMap.toggleGPS();
+	};
+	this.getDistance = function() {
+		console.log('calculate');
+		if (self.currentPosition()) {
+			self.activeLocations().forEach(function(location) {
+				viewMap.getDistance(location, viewModel.currentTravelMode().mode);
+			})
+		};
 	};
 	this.setDistance = function(location, distance) {
 		location.distance(distance);
