@@ -6,7 +6,12 @@ var initialLists = [
 	{
 		title: "Armenia",
 		id: "59b957aa3731ee2ab6c2677d"
-	}];
+	},
+	{
+		title: "Yuzhnaya",
+		id: "59be39f8588e366046f70c96"
+	}
+	];
 
 
 var List = function(data) {
@@ -66,6 +71,8 @@ var Location = function(data) {
 
 var ViewModel = function() {
 	var self = this;
+
+	FoundationView.init();
 
 	this.currentPosition = ko.observable();
 
@@ -132,7 +139,7 @@ var ViewModel = function() {
 		$.getJSON("https://api.foursquare.com/v2/lists/"
 				+ list.id + "?client_id=" + FOURSQUARE_CLIENT_KEY
 				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
-				+ "&v=20170913", function(data) {
+				+ "&v=20170913&locale=en", function(data) {
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
 					});
@@ -183,13 +190,27 @@ var ViewModel = function() {
 	};
 	this.setDistance = function(location, distance) {
 		location.distance(distance);
-	}
+	};
+	this.openInfoWindow = function(location) {
+		viewMap.openInfoWindow(location);
+		FoundationView.toggleMenu();
+	};
 
 };
 
+var FoundationView = {
+	init: function() {
+		$(document).foundation();
+	},
+	toggleMenu: function() {
+		$('#offCanvas').foundation('close');
+	}
+};
 
 var viewModel = new ViewModel();
 
 ko.applyBindings(viewModel);
 
-$(document).foundation();
+
+
+

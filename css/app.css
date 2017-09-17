@@ -4,6 +4,7 @@ html, body, main {
 
 body {
   overflow: hidden;
+  font-family: 'Josefin Sans', sans-serif;
 }
 
 .map, .off-canvas-wrapper {
@@ -34,10 +35,10 @@ body {
 .input-group {
   margin-bottom: 0.4rem;
 }
-/*
-.button {
-  margin-bottom: 0;
-}*/
+
+.button-group {
+  margin-bottom: 0.4rem;
+}
 
 .position-bottom {
   height: auto;

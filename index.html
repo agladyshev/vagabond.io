@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/foundation.min.css">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/foundation-icons/foundation-icons.css" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet">
     <link rel="icon" type="image/png" href="udacity_logo.png">
   </head>
   <body>
@@ -75,7 +76,7 @@
               <div class="list-locations small-order-5 cell" data-bind="visible: shouldListLocations">
                 <ul class="no-bullet" data-bind="foreach: activeLocations()">
                   <li class="grid-x">
-                    <div class="auto cell"><a class="title fi-map" data-bind="text: ' ' + $data.name"></a></div>
+                    <div class="auto cell"><a class="title fi-map" data-bind="text: ' ' + $data.name, click: $parent.openInfoWindow"></a></div>
                     <div class="shrink cell text-right" data-bind="text: $data.distance"></div>
                   </li>
                 </ul>
