@@ -48,9 +48,17 @@ body {
   font-size: 12px;
 }
 
+.title-bar .menu-icon {
+  margin-left: 1rem;
+}
+
 .list-locations {
   max-height: 30vh;
   overflow-y: scroll;
+}
+
+.infowindow-streetview {
+  margin: 0.2rem 0;
 }
 
   @media screen and (max-width: 40em) {

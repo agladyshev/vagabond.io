@@ -2,6 +2,7 @@ var map;
 var bounds;
 var infowindow;
 var geoPosition;
+var directionsDisplay;
 
 var viewMap = {
 	init: function() {
@@ -106,6 +107,11 @@ var viewMap = {
 		});
 		map.fitBounds(bounds);
 	},
+	resumeBounds: function() {
+		if (bounds) {
+			map.fitBounds(bounds);
+		}
+	},
 	openInfoWindow: function(location) {
 		this.closeInfoWindow();
 
@@ -142,14 +148,16 @@ var viewMap = {
 				'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
 				'<div class="cell small-2 text-right">' +
 				( location.rating ? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div></div>' +
-				( location.distance() ? '<div class="cell h6">' + location.distance() + ' - ' + location.duration() + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
+				( location.distance() ? '<div class="cell h6">' + location.distance().text +
+				' - ' + location.duration().text + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
 
 			location.categories().forEach(function(category) {
 				div += '<div class="cell button shrink">' + category.shortName + '</div>'
 			});
-        
+		
 			div += (location.phone? '<div class="cell shrink button fi-telephone"> ' + location.phone + '</div>': '') +
-				'</div><div class="cell infowindow-streetview" id="pano"></div>' + 
+				'</div><div class="cell infowindow-streetview" id="pano"></div>' +
+				'<div id="directions" class="fi-map cell shrink button tiny success" data-bin> Get directions</div>' +
 				'</div>'
 
 			return div;
@@ -157,9 +165,18 @@ var viewMap = {
 
 		infowindow = new google.maps.InfoWindow({
 			content: this.infoDiv(location)
-		  });
-		
+			});
 
+		// var mapDiv = document.getElementById('directions');
+		// console.log(mapdiv);
+
+		google.maps.event.addListener(infowindow, 'domready', function() {
+			document.getElementById('directions').addEventListener("click", function() {
+				viewModel.getDirections(location);
+			});
+			
+		});
+		
 		streetViewService.getPanoramaByLocation(location.marker.position, radius, getStreetView);
 
 		infowindow.open(map, location.marker);
@@ -182,9 +199,6 @@ var viewMap = {
 			}
 			var geoSuccess = function(position) {
 				geoPosition = position;
-				console.log(geoPosition.coords.latitude);
-				console.log(geoPosition.coords.longitude);
-				console.log(geoPosition);
 				viewModel.currentPosition(geoPosition);
 			};
 			var geoError = function(error) {
@@ -214,8 +228,39 @@ var viewMap = {
 				viewModel.setDistance(location, response.rows[0].elements[0]);
 			}
 		});
-		
-	}
+	},
+	getDirections: function(location, travelMode) {
+		// map.hideMarkers();
+		this.closeInfoWindow();
+		this.closeDirections();
+		var directionsService = new google.maps.DirectionsService;
+		directionsService.route({
+		origin: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
+		destination: location.marker.position,
+		travelMode: travelMode
+		}, function(response, status) {
+			if (status === google.maps.DirectionsStatus.OK) {
+				directionsDisplay = new google.maps.DirectionsRenderer({
+					map: map,
+					directions: response,
+					draggable: true,
+					// polylineOptions: {
+					// 	strokeColor: 'green'
+					// }
+				});
+			} else {
+				// window.alert('Directions request failed due to ' + status);
+			}
+			viewModel.directionsCallback(status);
+		});
+	},
+	closeDirections: function() {
+		if (directionsDisplay) {
+			directionsDisplay.setMap(null);
+			// directionsService.setMap(null);
+			// directionDisplay.set('directions', null);
+		};
+	},
 };
 
 var initMap = function() {

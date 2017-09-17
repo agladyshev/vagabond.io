@@ -198,10 +198,9 @@ var ViewModel = function() {
 		viewMap.toggleGPS();
 	};
 	this.getDistance = function() {
-		console.log('calculate');
 		if (self.currentPosition()) {
 			self.activeLocations().forEach(function(location) {
-				viewMap.getDistance(location, viewModel.currentTravelMode().mode);
+				viewMap.getDistance(location, self.currentTravelMode().mode);
 			})
 		};
 	};
@@ -227,6 +226,28 @@ var ViewModel = function() {
 		} else {
 			self.currentOrder(order);
 		};
+	};
+
+	this.shouldShowDirections = ko.observable(false);
+
+	this.getDirections = function(location) {
+		viewMap.getDirections(location, self.currentTravelMode().mode);
+		self.shouldShowDirections(true);
+	};
+	this.directionsCallback = function(status) {
+		if (status !== 'OK') {
+			// create modal here
+			if (status === "ZERO_RESULTS") {
+				console.log("Couldn't create a route. Try different transport mode.");
+			} else {
+				console.log("Directions are not available at the moment");
+			}
+		}
+	};
+	this.closeDirections = function() {
+		viewMap.closeDirections();
+		viewMap.resumeBounds();
+		self.shouldShowDirections(false);
 	};
 
 };
