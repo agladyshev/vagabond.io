@@ -142,7 +142,7 @@ var viewMap = {
 				'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
 				'<div class="cell small-2 text-right">' +
 				( location.rating ? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div></div>' +
-				( location.distance() ? '<div class="cell h6">' + location.distance() + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
+				( location.distance() ? '<div class="cell h6">' + location.distance() + ' - ' + location.duration() + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
 
 			location.categories().forEach(function(category) {
 				div += '<div class="cell button shrink">' + category.shortName + '</div>'
@@ -214,7 +214,10 @@ var viewMap = {
 				if (result.status !== "OK") {
 					viewModel.setDistance(location, 'No route found');
 				} else {
-					var distance = result.distance.text + ' / ' + result.duration.text;
+					var distance = {
+						distance: result.distance.text,
+						duration: result.duration.text
+					};
 					viewModel.setDistance(location, distance);
 				};
 			}

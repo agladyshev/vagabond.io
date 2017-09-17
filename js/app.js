@@ -66,6 +66,7 @@ var Location = function(data) {
 		viewMap.openInfoWindow(self);
 	});
 	this.distance = ko.observable();
+	this.duration = ko.observable();
 };
 
 
@@ -189,7 +190,8 @@ var ViewModel = function() {
 		};
 	};
 	this.setDistance = function(location, distance) {
-		location.distance(distance);
+		location.distance(distance.distance);
+		location.duration(distance.duration);
 	};
 	this.openInfoWindow = function(location) {
 		viewMap.openInfoWindow(location);
@@ -210,7 +212,3 @@ var FoundationView = {
 var viewModel = new ViewModel();
 
 ko.applyBindings(viewModel);
-
-
-
-

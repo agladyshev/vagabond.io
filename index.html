@@ -76,8 +76,11 @@
               <div class="list-locations small-order-5 cell" data-bind="visible: shouldListLocations">
                 <ul class="no-bullet" data-bind="foreach: activeLocations()">
                   <li class="grid-x">
-                    <div class="auto cell"><a class="title fi-map" data-bind="text: ' ' + $data.name, click: $parent.openInfoWindow"></a></div>
-                    <div class="shrink cell text-right" data-bind="text: $data.distance"></div>
+                    <div class="auto cell">
+                      <span class="badge" data-bind="text: $data.rating ? $data.rating : ''"></span>
+                      <a class="title" data-bind="text: '' + $data.name, click: $parent.openInfoWindow"></a>
+                    </div>
+                    <div class="shrink cell text-right" data-bind="text: $data.distance()"></div>
                   </li>
                 </ul>
               </div>
