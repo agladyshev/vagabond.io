@@ -41,7 +41,6 @@
                     </ul>
                   </li>
                 </ul>
-
                 <ul class="dropdown menu shrink cell" data-dropdown-menu>
                   <li>
                     <a data-bind="text: currentTravelMode().title"></a>
@@ -50,12 +49,9 @@
                     </ul>
                   </li>
                 </ul>
-
-
                 <div class="auto cell text-right grid-x align-middle align-right">
                   <div class="label" data-bind="text: gpsStatus() ? 'GPS: on': 'GPS: off', click: toggleGPS, css: { success: gpsStatus(), warning: !gpsStatus() }">GPS</div>
                 </div>
-
               </div>
               <div class="small-auto cell small-order-3 medium-order-1">
                 <div class="button-group tiny align-center grid-x" data-bind="foreach: currentCategories">
@@ -70,17 +66,30 @@
                   </div>
                 </form>
               </div>
-              <div class="small-auto cell small-order-4 text-center">
-                <div class="label fi-arrow-down" data-bind="click: toggleListLocations"> List locations</div>
+              <div class="small-order-4 medium-order-4 cell grid-x">
+                <ul class="dropdown menu cell auto" data-bind="css: {'align-center': !shouldListLocations()}">
+                  <li>
+                    <a class="fi-arrow-down" data-bind="click: toggleListLocations, visible: !shouldListLocations()"> List locations</a>
+                    <a class="fi-arrow-up" data-bind="click: toggleListLocations, visible: shouldListLocations()"> List locations</a>
+                  </li>
+                </ul>
+                <ul class="dropdown menu auto cell align-right" data-dropdown-menu data-bind="visible: shouldListLocations()">
+                  <li >
+                    <a data-bind="text: currentOrder().title"></a>
+                    <ul class="menu nested" data-bind="foreach: listOrders">
+                      <li><a data-bind="text: title, click: $parent.orderBy"></a></li>
+                    </ul>
+                  </li>
+                </ul>
               </div>
-              <div class="list-locations small-order-5 cell" data-bind="visible: shouldListLocations">
-                <ul class="no-bullet" data-bind="foreach: activeLocations()">
+              <div class="list-locations small-order-5 cell grid-x" data-bind="visible: shouldListLocations()">
+                <ul class="no-bullet cell" data-bind="foreach: activeLocations()">
                   <li class="grid-x">
                     <div class="auto cell">
-                      <span class="badge" data-bind="text: $data.rating ? $data.rating : ''"></span>
+                      <span class="badge" data-bind="text: $data.rating ? $data.rating : 'Ø'"></span>
                       <a class="title" data-bind="text: '' + $data.name, click: $parent.openInfoWindow"></a>
                     </div>
-                    <div class="shrink cell text-right" data-bind="text: $data.distance()"></div>
+                    <div class="shrink cell text-right" data-bind="text: $data.duration() ? ($parent.currentOrder().mode === 'distance' ? $data.distance().text : $data.duration().text) : ''"></div>
                   </li>
                 </ul>
               </div>

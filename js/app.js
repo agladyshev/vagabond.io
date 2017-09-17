@@ -73,7 +73,7 @@ var Location = function(data) {
 var ViewModel = function() {
 	var self = this;
 
-	FoundationView.init();
+	
 
 	this.currentPosition = ko.observable();
 
@@ -89,6 +89,14 @@ var ViewModel = function() {
 	this.currentTravelMode = ko.observable( this.travelModes()[0] );
 
 	this.lists = ko.observableArray([]);
+
+	this.listOrders = ko.observableArray([
+		{title: "Order by rating", mode: 'rating', direction: 'DESC'},
+		{title: "Order by duration", mode: 'duration', direction: 'ASC'},
+		{title: "Order by distance", mode: 'distance', direction: 'ASC'}
+		]);
+
+	this.currentOrder = ko.observable( this.listOrders()[0] );
 
 	initialLists.forEach(function(list) {
 		self.lists.push( new List(list) );
@@ -128,7 +136,15 @@ var ViewModel = function() {
 		if (typeof bounds !== 'undefined') {
 			viewMap.fitBounds(positions);
 		};
-		return activeLocations;
+		return activeLocations.sort(function (left, right) { 
+			var mode = self.currentOrder().mode;
+			// var direction = self.currentOrder().direction;
+			if (mode !== 'rating') {
+				return left[mode]()['value'] == right[mode]()['value'] ? 0 : (left[mode]()['value'] < right[mode]()['value'] ? -1 : 1)
+			} else {
+				return left[mode] == right[mode] ? 0 : (left[mode] > right[mode] ? -1 : 1)
+			}
+		});
 	}, this);
 
 	this.currentPosition.subscribe(function(newPosition) {
@@ -189,13 +205,28 @@ var ViewModel = function() {
 			})
 		};
 	};
-	this.setDistance = function(location, distance) {
-		location.distance(distance.distance);
-		location.duration(distance.duration);
+	this.setDistance = function(location, result) {
+		if (result.status !== 'OK') {
+			location.distance({text: "No route found"})
+		} else {
+			location.duration(result.duration);
+			location.distance(result.distance);
+		};
+		
 	};
 	this.openInfoWindow = function(location) {
 		viewMap.openInfoWindow(location);
 		FoundationView.toggleMenu();
+	};
+	this.orderBy = function(order) {
+		console.log(order.mode);
+		console.log(!self.gpsStatus())
+		if (order.mode !== 'rating' & !self.gpsStatus()) {
+			// create modal here
+			alert('Please turn on GPS');
+		} else {
+			self.currentOrder(order);
+		};
 	};
 
 };
@@ -212,3 +243,6 @@ var FoundationView = {
 var viewModel = new ViewModel();
 
 ko.applyBindings(viewModel);
+
+// Foundation is initialized after bindings to map events to knockout created elements
+FoundationView.init();

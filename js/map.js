@@ -210,16 +210,8 @@ var viewMap = {
 			if (status !== google.maps.DistanceMatrixStatus.OK) {
 				window.alert('Error was: ' + status);
 			} else {
-				result = response.rows[0].elements[0];
-				if (result.status !== "OK") {
-					viewModel.setDistance(location, 'No route found');
-				} else {
-					var distance = {
-						distance: result.distance.text,
-						duration: result.duration.text
-					};
-					viewModel.setDistance(location, distance);
-				};
+				// console.log(response.rows[0].elements[0])
+				viewModel.setDistance(location, response.rows[0].elements[0]);
 			}
 		});
 		
