@@ -119,10 +119,23 @@ var ViewModel = function() {
 		return activeCategories;	
 	}, this);
 
+	this.sortedLocations = ko.computed(function() {
+		return self.currentList().locations().sort(function (left, right) { 
+			var mode = self.currentOrder().mode;
+			// var direction = self.currentOrder().direction;
+			if (mode !== 'rating' && left[mode]() && right[mode]()) {
+				// Check if value has been already assigned
+				return left[mode]()['value'] == right[mode]()['value'] ? 0 : (left[mode]()['value'] < right[mode]()['value'] ? -1 : 1)
+			} else {
+				return left[mode] == right[mode] ? 0 : (left[mode] > right[mode] ? -1 : 1)
+			}
+		});
+	}, this);
+
 	this.activeLocations = ko.computed(function() {
 		var activeLocations = [];
 		var positions = [];
-		self.currentList().locations().forEach(function(location) {
+		self.sortedLocations().forEach(function(location) {
 			location.marker.setMap(null);
 			location.categories().forEach(function(locationCat) {
 				self.activeCategories().forEach(function(category) {
@@ -137,16 +150,17 @@ var ViewModel = function() {
 		if (typeof bounds !== 'undefined') {
 			viewMap.fitBounds(positions);
 		};
-		return activeLocations.sort(function (left, right) { 
-			var mode = self.currentOrder().mode;
-			// var direction = self.currentOrder().direction;
-			if (mode !== 'rating' && left[mode]() && right[mode]()) {
-				// Check if value has been already assigned
-				return left[mode]()['value'] == right[mode]()['value'] ? 0 : (left[mode]()['value'] < right[mode]()['value'] ? -1 : 1)
-			} else {
-				return left[mode] == right[mode] ? 0 : (left[mode] > right[mode] ? -1 : 1)
-			}
-		});
+		return activeLocations;
+		// return activeLocations.sort(function (left, right) { 
+		// 	var mode = self.currentOrder().mode;
+		// 	// var direction = self.currentOrder().direction;
+		// 	if (mode !== 'rating' && left[mode]() && right[mode]()) {
+		// 		// Check if value has been already assigned
+		// 		return left[mode]()['value'] == right[mode]()['value'] ? 0 : (left[mode]()['value'] < right[mode]()['value'] ? -1 : 1)
+		// 	} else {
+		// 		return left[mode] == right[mode] ? 0 : (left[mode] > right[mode] ? -1 : 1)
+		// 	}
+		// });
 	}, this);
 
 	this.currentPosition.subscribe(function(newPosition) {

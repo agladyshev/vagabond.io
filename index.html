@@ -60,15 +60,28 @@
                 </div>
               </div>
               <div class="small-auto medium-shrink cell small-order-2 medium-order-3">
-                <form class="input-group align-center" data-bind="submit: search">
+                <div class="input-group align-center">
                   <input class="input-group-field" type="text" data-bind="textInput: searchQuery">
                   <div class="input-group-button">
                     <input type="submit" class="button small" value="Search">
                   </div>
-                </form>
-                <div class="dropdown-pane grid-x" data-bind="visible: searchQuery(), foreach: searchResults()">
-                  <div class="cell" data-bind="text: name"></div>
                 </div>
+                <ul class="dropdown-pane no-bullet" data-bind="visible: searchQuery(), foreach: searchResults()">
+                  <li class="grid-x">
+                    <div class="auto cell">
+                      <span class="badge" data-bind="text: rating ? rating : 'Ø'"></span>
+                      <a class="title" data-bind="text: '' + name, click: $parent.openInfoWindow"></a>
+                    </div>
+                    <div class="shrink cell text-right" data-bind="text: (duration() && distance()) ? ($parent.currentOrder().mode === 'distance' ? distance().text : duration().text) : ''"></div>
+                  </li>
+                </ul>
+
+
+                <ul class="no-bullet cell" data-bind="foreach: activeLocations()">
+                  
+                </ul>
+
+
               </div>
               <div class="small-order-4 medium-order-4 cell grid-x">
                 <ul class="dropdown menu cell auto" data-bind="css: {'align-center': !shouldListLocations()}">
