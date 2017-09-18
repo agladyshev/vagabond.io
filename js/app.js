@@ -49,6 +49,7 @@ var Location = function(data) {
 	this.name = data.name;
 	this.phone = data.contact.phone;
 	this.rating = data.rating;
+	this.address = data.location.address;
 	this.LatLng = {lat: data.location.lat, lng: data.location.lng};
 	this.categories = ko.computed(function() {
 		var categories = [];
@@ -163,6 +164,39 @@ var ViewModel = function() {
 					});
 				});	
 		});
+
+	this.searchQuery = ko.observable();
+
+	this.searchResults = ko.computed(function() {
+		var searchItems;
+		var filteredLocations = [];
+		if (self.searchQuery()) {
+			searchItems = self.searchQuery().toLowerCase().split(' ', 3);
+			self.currentList().locations().forEach(function(location) {
+				searchItems.forEach(function(item) {
+					if (location.name.toLowerCase().includes(item)) {
+						filteredLocations.push(location);
+						return;
+					};
+					if (location.address && location.address.toLowerCase().includes(item)) {
+						filteredLocations.push(location);
+						return;
+					};
+					location.categories().forEach(function(category) {
+						if (category.name.toLowerCase().includes(item)) {
+							filteredLocations.push(location)
+							return;
+						};
+					});
+
+				});
+			});
+			console.log(filteredLocations);
+			return filteredLocations;
+		}
+
+
+	});
 
 	this.setCurrentList = function (list) {
 		self.hideMarkers();
