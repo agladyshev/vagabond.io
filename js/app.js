@@ -139,7 +139,8 @@ var ViewModel = function() {
 		return activeLocations.sort(function (left, right) { 
 			var mode = self.currentOrder().mode;
 			// var direction = self.currentOrder().direction;
-			if (mode !== 'rating') {
+			if (mode !== 'rating' && left[mode]() && right[mode]()) {
+				// Check if value has been already assigned
 				return left[mode]()['value'] == right[mode]()['value'] ? 0 : (left[mode]()['value'] < right[mode]()['value'] ? -1 : 1)
 			} else {
 				return left[mode] == right[mode] ? 0 : (left[mode] > right[mode] ? -1 : 1)
@@ -202,9 +203,6 @@ var ViewModel = function() {
 			self.activeLocations().forEach(function(location) {
 				viewMap.getDistance(location, self.currentTravelMode().mode);
 			});
-			// if (self.selectedLocation()) {
-			// 	viewMap.getDistance(self.selectedLocation(), self.currentTravelMode().mode);
-			// };
 		};
 	};
 	this.setDistance = function(location, result) {
