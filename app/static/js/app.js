@@ -166,7 +166,7 @@ var ViewModel = function() {
 
 
 	this.lists().forEach(function(list, index) {
-		$.getJSON("http://localhost:8000/api/v1.0/list/"
+		$.getJSON(window.location.href + "api/v1.0/list/"
 				+ list.id, function(data) {
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
@@ -260,9 +260,6 @@ var ViewModel = function() {
 			self.searchQuery(null);
 		};
 		self.selectedLocation(location);
-		console.log(self.selectedLocation());
-		console.log(location);
-		console.log(document.getElementById('info-content'));
 		viewMap.openInfoWindow(location);
 
 		FoundationView.toggleMenu();

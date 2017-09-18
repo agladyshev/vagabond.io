@@ -173,7 +173,6 @@ var viewMap = {
 			infowindow.setContent(document.getElementById('info-content'));
 		};
 
-		console.log(infowindow.content);
 
 		// var mapDiv = document.getElementById('directions');
 		// console.log(mapdiv);
