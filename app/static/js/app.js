@@ -166,14 +166,12 @@ var ViewModel = function() {
 
 
 	this.lists().forEach(function(list, index) {
-		$.getJSON("https://api.foursquare.com/v2/lists/"
-				+ list.id + "?client_id=" + FOURSQUARE_CLIENT_KEY
-				+ "&client_secret=" + FOURSQUARE_CLIENT_SECRET
-				+ "&v=20170913&locale=en", function(data) {
+		$.getJSON("http://localhost:8000/api/v1.0/list/"
+				+ list.id, function(data) {
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
-					});
-				});	
+				});
+			});	
 		});
 
 	this.searchQuery = ko.observable();
