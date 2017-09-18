@@ -63,7 +63,7 @@ var Location = function(data) {
 		// animation: google.maps.Animation.DROP
 	});
 	self.marker.addListener('click', function() {
-		viewMap.openInfoWindow(self);
+		viewModel.openInfoWindow(self);
 	});
 	this.distance = ko.observable();
 	this.duration = ko.observable();
@@ -73,8 +73,6 @@ var Location = function(data) {
 var ViewModel = function() {
 	var self = this;
 
-	
-
 	this.currentPosition = ko.observable();
 
 	this.travelModes = ko.observableArray([
@@ -83,6 +81,8 @@ var ViewModel = function() {
 			{title: "Transit", mode: "TRANSIT"},
 			{title: "Cycling", mode: "BICYCLING"}
 		]);
+
+	this.selectedLocation = ko.observable();
 
 	this.gpsStatus = ko.observable(false);
 
@@ -201,19 +201,26 @@ var ViewModel = function() {
 		if (self.currentPosition()) {
 			self.activeLocations().forEach(function(location) {
 				viewMap.getDistance(location, self.currentTravelMode().mode);
-			})
+			});
+			// if (self.selectedLocation()) {
+			// 	viewMap.getDistance(self.selectedLocation(), self.currentTravelMode().mode);
+			// };
 		};
 	};
 	this.setDistance = function(location, result) {
 		if (result.status !== 'OK') {
 			location.distance({text: "No route found"})
 		} else {
+			console.log(location.name);
 			location.duration(result.duration);
+			console.log(location.name);
 			location.distance(result.distance);
 		};
-		
 	};
+
 	this.openInfoWindow = function(location) {
+		self.selectedLocation(location);
+		console.log(self.selectedLocation());
 		viewMap.openInfoWindow(location);
 		FoundationView.toggleMenu();
 	};
@@ -231,8 +238,16 @@ var ViewModel = function() {
 	this.shouldShowDirections = ko.observable(false);
 
 	this.getDirections = function(location) {
-		viewMap.getDirections(location, self.currentTravelMode().mode);
-		self.shouldShowDirections(true);
+		console.log('sdf');
+		console.log(location);
+		if (!self.gpsStatus()) {
+			self.toggleGPS();
+		} else {
+			console.log('2');
+			viewMap.getDirections(location, self.currentTravelMode().mode);
+			self.shouldShowDirections(true);
+		}
+		
 	};
 	this.directionsCallback = function(status) {
 		if (status !== 'OK') {

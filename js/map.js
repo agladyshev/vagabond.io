@@ -113,6 +113,7 @@ var viewMap = {
 		}
 	},
 	openInfoWindow: function(location) {
+
 		this.closeInfoWindow();
 
 		var streetViewService = new google.maps.StreetViewService();
@@ -141,41 +142,45 @@ var viewMap = {
 		};
 
 
-		this.infoDiv = function(location) {
+		// this.infoDiv = function(location) {
 
-			var div = '<div class="grid-container infowindow"><div class="grid-x">' +
-				'<div class="cell grid-x">' +
-				'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
-				'<div class="cell small-2 text-right">' +
-				( location.rating ? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div></div>' +
-				( location.distance() ? '<div class="cell h6">' + location.distance().text +
-				' - ' + location.duration().text + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
+		// 	var div = '<div class="grid-container infowindow"><div class="grid-x">' +
+		// 		'<div class="cell grid-x">' +
+		// 		'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
+		// 		'<div class="cell small-2 text-right">' +
+		// 		( location.rating ? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div></div>' +
+		// 		( location.distance() ? '<div class="cell h6">' + location.distance().text +
+		// 		' - ' + location.duration().text + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
 
-			location.categories().forEach(function(category) {
-				div += '<div class="cell button shrink">' + category.shortName + '</div>'
-			});
+		// 	location.categories().forEach(function(category) {
+		// 		div += '<div class="cell button shrink">' + category.shortName + '</div>'
+		// 	});
 		
-			div += (location.phone? '<div class="cell shrink button fi-telephone"> ' + location.phone + '</div>': '') +
-				'</div><div class="cell infowindow-streetview" id="pano"></div>' +
-				'<div id="directions" class="fi-map cell shrink button tiny success" data-bin> Get directions</div>' +
-				'</div>'
+		// 	div += (location.phone? '<div class="cell shrink button fi-telephone"> ' + location.phone + '</div>': '') +
+		// 		'</div><div class="cell infowindow-streetview" id="pano"></div>' +
+		// 		'<div class="cell grid-x align-spaced">' +
+		// 		'<div id="directions" class="fi-map cell shrink button tiny success"> Get directions</div>' +
+		// 		'<div id="directions" class="fi-telephone cell shrink button tiny warning"> Get UBER</div>' +
+		// 		'</div></div>'
 
-			return div;
+		// 	return div;
+		// };
+		// 
+
+		if (!infowindow) {
+			infowindow = new google.maps.InfoWindow({});
+			infowindow.setContent(document.getElementById('info-content'));
 		};
-
-		infowindow = new google.maps.InfoWindow({
-			content: this.infoDiv(location)
-			});
 
 		// var mapDiv = document.getElementById('directions');
 		// console.log(mapdiv);
 
-		google.maps.event.addListener(infowindow, 'domready', function() {
-			document.getElementById('directions').addEventListener("click", function() {
-				viewModel.getDirections(location);
-			});
+		// google.maps.event.addListener(infowindow, 'domready', function() {
+		// 	document.getElementById('directions').addEventListener("click", function() {
+		// 		viewModel.getDirections(location);
+		// 	});
 			
-		});
+		// });
 		
 		streetViewService.getPanoramaByLocation(location.marker.position, radius, getStreetView);
 
@@ -183,7 +188,6 @@ var viewMap = {
 	},
 	closeInfoWindow: function() {
 		if (infowindow) {
-			infowindow.setContent('');
 			infowindow.marker = null;
 			infowindow.close();
 		};
