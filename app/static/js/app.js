@@ -262,7 +262,11 @@ var ViewModel = function() {
 			self.searchQuery(null);
 		};
 		self.selectedLocation(location);
+		console.log(self.selectedLocation());
+		console.log(location);
+		console.log(document.getElementById('info-content'));
 		viewMap.openInfoWindow(location);
+
 		FoundationView.toggleMenu();
 	};
 	this.orderBy = function(order) {
@@ -315,6 +319,9 @@ var FoundationView = {
 };
 
 var viewModel = new ViewModel();
+
+// Added deferred option when infowindow updates stopped working after moving to flask
+ko.options.deferUpdates = true;
 
 ko.applyBindings(viewModel);
 

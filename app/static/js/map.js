@@ -166,11 +166,14 @@ var viewMap = {
 		// 	return div;
 		// };
 		// 
+		// console.log(infowindow);
 
 		if (!infowindow) {
 			infowindow = new google.maps.InfoWindow({});
 			infowindow.setContent(document.getElementById('info-content'));
 		};
+
+		console.log(infowindow.content);
 
 		// var mapDiv = document.getElementById('directions');
 		// console.log(mapdiv);
@@ -206,6 +209,7 @@ var viewMap = {
 				viewModel.currentPosition(geoPosition);
 			};
 			var geoError = function(error) {
+
 				console.log('Error occurred. Error code: ' + error.code);
 				// error.code can be:
 				//   0: unknown error
@@ -213,6 +217,7 @@ var viewMap = {
 				//   2: position unavailable (error response from location provider)
 				//   3: timed out
 			};
+			
 			navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
 		};
 	},

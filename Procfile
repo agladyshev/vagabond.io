@@ -1,0 +1,1 @@
+run: gunicorn manage:app

@@ -12,3 +12,9 @@ node_modules
 package-lock.json
 
 js/keys.js
+
+# Python
+*.pyc
+
+# VirutalEnv
+venv
