@@ -58,14 +58,21 @@ var Location = function(data) {
 		});
 		return categories;
 	}, this);
-	self.marker = new google.maps.Marker({
-		// icon: image,
-		position: self.LatLng,
-		// animation: google.maps.Animation.DROP
-	});
-	self.marker.addListener('click', function() {
-		viewModel.openInfoWindow(self);
-	});
+
+	self.marker = ko.computed(function() {
+		if (map) {
+			var marker =  new google.maps.Marker({
+				// icon: image,
+				position: self.LatLng,
+				// animation: google.maps.Animation.DROP
+				});
+			marker.addListener('click', function() {
+				viewModel.openInfoWindow(self);
+			});
+			return marker;
+		}
+	}, this);
+
 	this.distance = ko.observable();
 	this.duration = ko.observable();
 };
@@ -136,13 +143,13 @@ var ViewModel = function() {
 		var activeLocations = [];
 		var positions = [];
 		self.sortedLocations().forEach(function(location) {
-			location.marker.setMap(null);
+			location.marker().setMap(null);
 			location.categories().forEach(function(locationCat) {
 				self.activeCategories().forEach(function(category) {
 					if (category.id === locationCat.id) {
 						activeLocations.push(location);
-						location.marker.setMap(map);
-						positions.push(location.marker.getPosition());
+						location.marker().setMap(map);
+						positions.push(location.marker().getPosition());
 					};
 				});
 			});
@@ -151,16 +158,6 @@ var ViewModel = function() {
 			viewMap.fitBounds(positions);
 		};
 		return activeLocations;
-		// return activeLocations.sort(function (left, right) { 
-		// 	var mode = self.currentOrder().mode;
-		// 	// var direction = self.currentOrder().direction;
-		// 	if (mode !== 'rating' && left[mode]() && right[mode]()) {
-		// 		// Check if value has been already assigned
-		// 		return left[mode]()['value'] == right[mode]()['value'] ? 0 : (left[mode]()['value'] < right[mode]()['value'] ? -1 : 1)
-		// 	} else {
-		// 		return left[mode] == right[mode] ? 0 : (left[mode] > right[mode] ? -1 : 1)
-		// 	}
-		// });
 	}, this);
 
 	this.currentPosition.subscribe(function(newPosition) {
@@ -205,11 +202,12 @@ var ViewModel = function() {
 
 				});
 			});
-			console.log(filteredLocations);
-			return filteredLocations;
+			if (filteredLocations.length) {
+				return filteredLocations;
+			} else {
+				return null;
+			}
 		}
-
-
 	});
 
 	this.setCurrentList = function (list) {
@@ -220,7 +218,7 @@ var ViewModel = function() {
 
 	this.hideMarkers = function () {
 		self.currentList().locations().forEach(function(location) {
-			location.marker.setMap(null);
+			location.marker().setMap(null);
 		});
 		viewMap.resetBounds();
 	};
@@ -239,9 +237,6 @@ var ViewModel = function() {
 	this.toggleCategory = function(category) {
 		category.active(!category.active());
 	};
-	this.search = function(form) {
-		console.log(form);
-	};
 	this.toggleGPS = function() {
 		self.gpsStatus(!self.gpsStatus());
 		viewMap.toggleGPS();
@@ -257,22 +252,20 @@ var ViewModel = function() {
 		if (result.status !== 'OK') {
 			location.distance({text: "No route found"})
 		} else {
-			console.log(location.name);
 			location.duration(result.duration);
-			console.log(location.name);
 			location.distance(result.distance);
 		};
 	};
 
 	this.openInfoWindow = function(location) {
+		if (self.searchQuery()) {
+			self.searchQuery(null);
+		};
 		self.selectedLocation(location);
-		console.log(self.selectedLocation());
 		viewMap.openInfoWindow(location);
 		FoundationView.toggleMenu();
 	};
 	this.orderBy = function(order) {
-		console.log(order.mode);
-		console.log(!self.gpsStatus())
 		if (order.mode !== 'rating' & !self.gpsStatus()) {
 			// create modal here
 			alert('Please turn on GPS');
@@ -284,12 +277,9 @@ var ViewModel = function() {
 	this.shouldShowDirections = ko.observable(false);
 
 	this.getDirections = function(location) {
-		console.log('sdf');
-		console.log(location);
 		if (!self.gpsStatus()) {
 			self.toggleGPS();
 		} else {
-			console.log('2');
 			viewMap.getDirections(location, self.currentTravelMode().mode);
 			self.shouldShowDirections(true);
 		}
@@ -308,6 +298,8 @@ var ViewModel = function() {
 	this.closeDirections = function() {
 		viewMap.closeDirections();
 		viewMap.resumeBounds();
+	};
+	this.closeDirectionsCallback = function() {
 		self.shouldShowDirections(false);
 	};
 

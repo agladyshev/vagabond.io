@@ -23,17 +23,9 @@ body {
   padding-bottom: 0.5rem;
 }
 
-.input-group {
-  height: 2rem;
-}
-
 .top-bar input {
   margin-right: 0;
   max-width: none;
-}
-
-.input-group {
-  margin-bottom: 0.4rem;
 }
 
 .button-group, .button {
@@ -52,9 +44,15 @@ body {
   margin-left: 1rem;
 }
 
-.list-locations {
+.list-locations, .search-results {
   max-height: 30vh;
   overflow-y: scroll;
+  right: 0px;
+}
+
+.search-input {
+  height: 1.5rem;
+  margin-bottom: 0;
 }
 
 .infowindow-streetview {

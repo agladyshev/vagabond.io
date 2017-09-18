@@ -16,15 +16,34 @@
       <header class="cell shrink">
         <div class="grid-container full">
           <div class="title-bar grid-x">
-            <div class="cell small-6 title-bar-title">
+            <div class="cell small-5 title-bar-title">
               <?xml version="1.0" encoding="UTF-8"?>
               <svg width="0.8em" height="0.8em" viewBox="0 -20 600 600" xmlns="http://www.w3.org/2000/svg">
               <path transform="translate(300 300) scale(.03875 -.03875)" fill="#ffffff" d="m-7344-12c0 1005 331 1879 992 2620 0 947 383 1805 1148 2576 763 768 1617 1152 2564 1152 747 672 1623 1008 2628 1008s1879-331 2620-992c947 0 1805-383 2576-1148 768-763 1152-1617 1152-2564 672-747 1008-1623 1008-2628s-331-1879-992-2620c0-947-383-1805-1148-2576-763-768-1617-1152-2564-1152-747-672-1623-1008-2628-1008s-1879 331-2620 992c-947 0-1805 383-2576 1148-768 763-1152 1617-1152 2564-672 747-1008 1623-1008 2628zm1008 12c0-377 72-748 216-1112 200 561 508 1047 924 1460 779 776 1704 1164 2776 1164 595 0 1156-128 1684-384-133 293-291 549-472 768-585 676-1291 1014-2117 1014s-1534-273-2125-818-886-1243-886-2092zm1e3 -2423c0-809 283-1497 848-2065 281-281 599-495 954-640-263 541-394 1137-394 1786 0 769 240 1497 721 2182s1110 1168 1889 1448c-347 139-713 208-1098 208-811 0-1500-284-2068-853s-852-1257-852-2066zm208 5957c541 263 1137 394 1786 394 769 0 1497-240 2182-721s1168-1110 1448-1889c139 347 208 713 208 1098 0 811-284 1500-853 2068s-1257 852-2066 852-1497-283-2065-848c-281-281-495-599-640-954zm2218-6859c0-826 273-1534 818-2125s1243-886 2092-886c377 0 748 72 1112 216-561 200-1047 508-1460 924-776 779-1164 1704-1164 2776 0 595 128 1156 384 1684-293-133-549-291-768-472-676-585-1014-1291-1014-2117zm1798 9445c561-200 1047-508 1460-924 776-779 1164-1704 1164-2776 0-595-128-1156-384-1684 293 133 549 291 768 472 676 585 1014 1291 1014 2117s-273 1534-818 2125-1243 886-2092 886c-377 0-748-72-1112-216zm616-8536c0-811 284-1500 853-2068s1257-852 2066-852 1497 283 2065 848c281 281 495 599 640 954-541-263-1137-394-1786-394-769 0-1497 240-2182 721s-1168 1110-1448 1889c-139-347-208-713-208-1098zm1232 1288c133-293 291-549 472-768 585-676 1291-1014 2117-1014s1534 273 2125 818 886 1243 886 2092c0 377-72 748-216 1112-200-561-508-1047-924-1460-779-776-1704-1164-2776-1164-595 0-1156 128-1684 384zm582 840c347-139 713-208 1098-208 811 0 1500 284 2068 853s852 1257 852 2066-283 1497-848 2065c-281 281-599 495-954 640 263-541 394-1137 394-1786 0-769-240-1497-721-2182s-1110-1168-1889-1448z"/>
               </svg> vagabond.io</div>
-            <div class="cell small-6 text-right grid-x align-right align-middle">
+            <div class="cell small-7 text-right grid-x align-right align-middle">
+              <div class="auto cell grid-x align-right" data-bind="visible: !shouldShowDirections()">
+                <input class="search-input cell small-auto medium-shrink" type="text" placeholder="just find a place" data-bind="textInput: searchQuery">
+              </div>
               <button class="cell shrink button tiny hollow secondary" data-bind="visible: shouldShowDirections(), click: closeDirections">Close directions</button>
-              <button class="cell menu-icon" type="button" data-toggle="offCanvas"></button>
+              <div class="cell shrink">
+                <button class="menu-icon" type="button" data-toggle="offCanvas"></button>
+              </div>
             </div>
+          </div>
+          <div class="search-results" data-bind="visible: searchQuery()">
+            <div class="dropdown-pane">
+              <div data-bind="foreach: searchResults()">
+                <div class="grid-x">
+                  <div class="auto cell">
+                    <span class="badge" data-bind="text: rating ? rating : 'Ø'"></span>
+                    <a class="title" data-bind="text: '' + name, click: $parent.openInfoWindow"></a>
+                  </div>
+                  <div class="shrink cell text-right" data-bind="text: (duration() && distance()) ? ($parent.currentOrder().mode === 'distance' ? distance().text : duration().text) : ''"></div>
+                </div>
+              </div>
+            </div>
+            <div data-bind="text: 'no results', visible: !searchResults()"></div>
           </div>
         </div>
       </header>
@@ -33,7 +52,6 @@
           <div class="grid-container">
             <div class="grid-x top-bar">
               <div class="options small-order-1 medium-order-2 small-auto medium-shrink cell grid-x">
-
                 <ul class="dropdown menu shrink cell" data-dropdown-menu>
                   <li>
                     <a data-bind="text: currentList().title"></a>
@@ -58,30 +76,6 @@
                 <div class="button-group tiny align-center grid-x" data-bind="foreach: currentCategories">
                   <a class="button cell shrink" data-bind="text: $data.pluralName, click: $parent.toggleCategory, css: { hollow: !$data.active() }"></a>
                 </div>
-              </div>
-              <div class="small-auto medium-shrink cell small-order-2 medium-order-3">
-                <div class="input-group align-center">
-                  <input class="input-group-field" type="text" data-bind="textInput: searchQuery">
-                  <div class="input-group-button">
-                    <input type="submit" class="button small" value="Search">
-                  </div>
-                </div>
-                <ul class="dropdown-pane no-bullet" data-bind="visible: searchQuery(), foreach: searchResults()">
-                  <li class="grid-x">
-                    <div class="auto cell">
-                      <span class="badge" data-bind="text: rating ? rating : 'Ø'"></span>
-                      <a class="title" data-bind="text: '' + name, click: $parent.openInfoWindow"></a>
-                    </div>
-                    <div class="shrink cell text-right" data-bind="text: (duration() && distance()) ? ($parent.currentOrder().mode === 'distance' ? distance().text : duration().text) : ''"></div>
-                  </li>
-                </ul>
-
-
-                <ul class="no-bullet cell" data-bind="foreach: activeLocations()">
-                  
-                </ul>
-
-
               </div>
               <div class="small-order-4 medium-order-4 cell grid-x">
                 <ul class="dropdown menu cell auto" data-bind="css: {'align-center': !shouldListLocations()}">
@@ -150,10 +144,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="js/foundation/foundation.min.js"></script>
     <script src="js/keys.js"></script>
-    <script src="js/app.js"></script>
     <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+    
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyC7RnGX171scgI56S88ugzd-VXRc1J78-I&v=3&v=3&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyCE5Awu_c3yE5qFvvT1QdjLH597d42egNQ&v=3&v=3&callback=initMap">
     </script>
   </body>
 </html>

@@ -123,7 +123,7 @@ var viewMap = {
 			if (status == google.maps.StreetViewStatus.OK) {
 				var nearStreetViewLocation = data.location.latLng;
 				var heading = google.maps.geometry.spherical.computeHeading(
-					nearStreetViewLocation, location.marker.position);
+					nearStreetViewLocation, location.marker().position);
 					
 				var panoramaOptions = {
 					position: nearStreetViewLocation,
@@ -182,9 +182,9 @@ var viewMap = {
 			
 		// });
 		
-		streetViewService.getPanoramaByLocation(location.marker.position, radius, getStreetView);
+		streetViewService.getPanoramaByLocation(location.marker().position, radius, getStreetView);
 
-		infowindow.open(map, location.marker);
+		infowindow.open(map, location.marker());
 	},
 	closeInfoWindow: function() {
 		if (infowindow) {
@@ -221,7 +221,7 @@ var viewMap = {
 		var distanceMatrixService = new google.maps.DistanceMatrixService;
 		distanceMatrixService.getDistanceMatrix({
 			origins: [{lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude}],
-			destinations: [location.marker.position],
+			destinations: [location.marker().position],
 			travelMode: travelMode,
 			unitSystem: google.maps.UnitSystem.METRIC,
 		}, function(response, status) {
@@ -240,7 +240,7 @@ var viewMap = {
 		var directionsService = new google.maps.DirectionsService;
 		directionsService.route({
 		origin: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
-		destination: location.marker.position,
+		destination: location.marker().position,
 		travelMode: travelMode
 		}, function(response, status) {
 			if (status === google.maps.DirectionsStatus.OK) {
@@ -264,6 +264,7 @@ var viewMap = {
 			// directionsService.setMap(null);
 			// directionDisplay.set('directions', null);
 		};
+		viewModel.closeDirectionsCallback();
 	},
 };
 
