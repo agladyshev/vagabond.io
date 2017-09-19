@@ -101,7 +101,7 @@
                       <span class="badge" data-bind="text: $data.rating ? $data.rating : 'Ø'"></span>
                       <a class="title" data-bind="text: '' + $data.name, click: $parent.openInfoWindow"></a>
                     </div>
-                    <div class="shrink cell text-right" data-bind="text: ($data.duration() && $data.distance()) ? ($parent.currentOrder().mode === 'distance' ? $data.distance().text : $data.duration().text) : 'No route found'"></div>
+                    <div class="shrink cell text-right" data-bind="text: ($data.duration() && $data.distance()) ? ($parent.currentOrder().mode === 'distance' ? $data.distance().text : $data.duration().text) : 'No route found', visible=$parent.gpsStatus()"></div>
                   </li>
                 </ul>
               </div>
@@ -125,8 +125,8 @@
             <span class="badge" data-bind="visible: rating, text: rating"></span>
           </div>
           </div>
-          <div class="cell h6" data-bind="text: (duration() && distance()) ? (distance().text + ' - ' + duration().text) : 'No route found'"></div>
-
+          <div class="cell h6" data-bind="text: (duration() && distance()) ? (distance().text + ' - ' + duration().text) : 'No route found', visible: $parent.gpsStatus()"></div>
+          <!-- <div class="cell h6" data-bind="text: $parent.gpsStatus() ? ((duration() && distance()) ? (distance().text + ' - ' + duration().text) : 'No route found'") : ''></div> -->
           <div class="cell grid-x button-group tiny" data-bind="foreach: categories()">
             <div class="cell button shrink" data-bind="text: shortName"></div>
           </div>
@@ -134,7 +134,7 @@
           <div class="cell grid-x button-group tiny align-center">
             <a class="fi-marker cell shrink button secondary" data-bind="visible: !$parent.gpsStatus(), click: $parent.toggleGPS"> Turn on geolocation</a>
             <a class="fi-map cell shrink button success" data-bind="visible: $parent.gpsStatus(), click: $parent.getDirections"> Get directions</a>
-            <a class="fi-telephone cell shrink button warning" data-bind="visible: $parent.gpsStatus(), click: $parent.getUber"> Get UBER</a>
+            <!-- <a class="fi-telephone cell shrink button warning" data-bind="visible: $parent.gpsStatus(), click: $parent.getUber"> Get UBER</a> -->
             <a class="cell shrink button fi-telephone" data-bind="text: phone ? (' ' + phone) : '', visible: phone"></a>
           </div>
         </div>

@@ -86,7 +86,7 @@ var ViewModel = function() {
 
 	this.start = function() {
 		self.gpsStatus = ko.observable(null);
-		self.currentPosition = ko.observable();
+		self.currentPosition = ko.observable(null);
 		self.currentPosition.subscribe(function(newPosition) {
 			self.getDistance();
 		});
@@ -101,7 +101,6 @@ var ViewModel = function() {
 		self.isLoading = ko.observable(false);
 		self.shouldListLocations = ko.observable(false);
 		self.shouldShowDirections = ko.observable(false);
-		self.gpsError = ko.observable(false);
 		self.modalText = ko.observable('');
 
 		self.lists = ko.observableArray([]);
@@ -381,6 +380,9 @@ var ViewModel = function() {
 	this.closeDirectionsCallback = function() {
 		self.shouldShowDirections(false);
 	};
+
+	// Uber function (in work)
+	// 
 	// this.getUber = function(location) {
 	// 	var link = 'https://m.uber.com/ul/?'
 	// 	'client_id=<CLIENT_ID>'
