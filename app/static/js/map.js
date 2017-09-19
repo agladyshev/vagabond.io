@@ -140,49 +140,10 @@ var viewMap = {
 				document.getElementById('pano').classList.toggle("infowindow-streetview");
 			};
 		};
-
-
-		// this.infoDiv = function(location) {
-
-		// 	var div = '<div class="grid-container infowindow"><div class="grid-x">' +
-		// 		'<div class="cell grid-x">' +
-		// 		'<div class="cell small-10"><div class="h5">' + location.name + '</div></div>' +
-		// 		'<div class="cell small-2 text-right">' +
-		// 		( location.rating ? '<span class="badge">' + location.rating + '</span>' : '' ) + '</div></div>' +
-		// 		( location.distance() ? '<div class="cell h6">' + location.distance().text +
-		// 		' - ' + location.duration().text + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
-
-		// 	location.categories().forEach(function(category) {
-		// 		div += '<div class="cell button shrink">' + category.shortName + '</div>'
-		// 	});
-		
-		// 	div += (location.phone? '<div class="cell shrink button fi-telephone"> ' + location.phone + '</div>': '') +
-		// 		'</div><div class="cell infowindow-streetview" id="pano"></div>' +
-		// 		'<div class="cell grid-x align-spaced">' +
-		// 		'<div id="directions" class="fi-map cell shrink button tiny success"> Get directions</div>' +
-		// 		'<div id="directions" class="fi-telephone cell shrink button tiny warning"> Get UBER</div>' +
-		// 		'</div></div>'
-
-		// 	return div;
-		// };
-		// 
-		// console.log(infowindow);
-
 		if (!infowindow) {
 			infowindow = new google.maps.InfoWindow({});
 			infowindow.setContent(document.getElementById('info-content'));
 		};
-
-
-		// var mapDiv = document.getElementById('directions');
-		// console.log(mapdiv);
-
-		// google.maps.event.addListener(infowindow, 'domready', function() {
-		// 	document.getElementById('directions').addEventListener("click", function() {
-		// 		viewModel.getDirections(location);
-		// 	});
-			
-		// });
 		
 		streetViewService.getPanoramaByLocation(location.marker().position, radius, getStreetView);
 
@@ -205,9 +166,11 @@ var viewMap = {
 			}
 			var geoSuccess = function(position) {
 				geoPosition = position;
-				viewModel.currentPosition(geoPosition);
+				viewModel.gpsCallback(geoPosition);
+				// viewModel.currentPosition(geoPosition);
 			};
 			var geoError = function(error) {
+				viewModel.gpsErrorEvent();
 
 				console.log('Error occurred. Error code: ' + error.code);
 				// error.code can be:
@@ -216,7 +179,6 @@ var viewMap = {
 				//   2: position unavailable (error response from location provider)
 				//   3: timed out
 			};
-			
 			navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
 		};
 	},
@@ -241,26 +203,31 @@ var viewMap = {
 		// map.hideMarkers();
 		this.closeInfoWindow();
 		this.closeDirections();
-		var directionsService = new google.maps.DirectionsService;
-		directionsService.route({
-		origin: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
-		destination: location.marker().position,
-		travelMode: travelMode
-		}, function(response, status) {
-			if (status === google.maps.DirectionsStatus.OK) {
-				directionsDisplay = new google.maps.DirectionsRenderer({
-					map: map,
-					directions: response,
-					draggable: true,
-					// polylineOptions: {
-					// 	strokeColor: 'green'
-					// }
-				});
-			} else {
-				// window.alert('Directions request failed due to ' + status);
-			}
-			viewModel.directionsCallback(status);
-		});
+		if (!geoPosition) {
+			viewModel.openModal("GPS service unavailable. Please try again later.");
+			viewModel.closeDirectionsCallback();
+		} else {
+			var directionsService = new google.maps.DirectionsService;
+			directionsService.route({
+			origin: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
+			destination: location.marker().position,
+			travelMode: travelMode
+			}, function(response, status) {
+				if (status === google.maps.DirectionsStatus.OK) {
+					directionsDisplay = new google.maps.DirectionsRenderer({
+						map: map,
+						directions: response,
+						draggable: true,
+						// polylineOptions: {
+						// 	strokeColor: 'green'
+						// }
+					});
+				} else {
+					// window.alert('Directions request failed due to ' + status);
+				}
+				viewModel.directionsCallback(status);
+			});;
+		};
 	},
 	closeDirections: function() {
 		if (directionsDisplay) {

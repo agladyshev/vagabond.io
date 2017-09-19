@@ -60,8 +60,12 @@ body {
 }
 
   @media screen and (max-width: 40em) {
-
-
+    .reveal {
+        left: 10vw;
+        width: 80vw;
+        height: auto;
+        min-height: 10vh;
+    }
     .infowindow {
       width: 80vw;
     }

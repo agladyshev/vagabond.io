@@ -18,19 +18,6 @@ var List = function(data) {
 	this.title = data.title;
 	this.id = data.id;
 	this.locations = ko.observableArray([]);
-	// this.categories = ko.computed(function() {
-	// 	var list = [];
-	// 	var index = [];
-	// 	this.locations().forEach(function(location) {
-	// 		location.categories().forEach(function(category) {
-	// 			if (index.indexOf(category.id) === - 1) {
-	// 				list.push(category);
-	// 				index.push(category.id);
-	// 			}		
-	// 		});
-	// 	});
-	// 	return list;
-	// }, this);
 	this.categories = ko.observableArray([]);
 };
 
@@ -98,7 +85,7 @@ var ViewModel = function() {
 
 
 	this.start = function() {
-		self.gpsStatus = ko.observable(false);
+		self.gpsStatus = ko.observable(null);
 		self.currentPosition = ko.observable();
 		self.currentPosition.subscribe(function(newPosition) {
 			self.getDistance();
@@ -107,8 +94,15 @@ var ViewModel = function() {
 		self.selectedLocation = ko.observable();
 		self.searchQuery = ko.observable();
 
+
 		self.currentTravelMode = ko.observable( this.travelModes()[0] );
 		self.currentOrder = ko.observable( this.listOrders()[0] );
+
+		this.shouldListLocations = ko.observable(false);
+		this.shouldShowDirections = ko.observable(false);
+		this.gpsError = ko.observable(false);
+		// this.shouldShowModal = ko.observable(false);
+		self.modalText = ko.observable('');
 
 		self.lists = ko.observableArray([]);
 		self.currentList = ko.observable();
@@ -118,15 +112,10 @@ var ViewModel = function() {
 		});
 
 		// Get localstorage data before it is overwritten by computed variables
-		// !
-		// !
-		// !
-		// ! rewrite condition
+
 		if (localStorage.initList) {
 			self.initList = JSON.parse(localStorage.initList);
-			console.log(self.initList);
 			self.initCategories = JSON.parse(localStorage[self.initList.id]);
-			console.log(self.initCategories);
 		};
 
 		// Set default list and get initial data
@@ -144,10 +133,8 @@ var ViewModel = function() {
 	};
 
 	this.setCurrentList = function (list) {
-		console.log('here');
 		if (self.currentList()) {
 			self.hideMarkers();
-			console.log('getinit');
 			if (localStorage[list.id]) {
 				self.initCategories = JSON.parse(localStorage[list.id]);
 			};
@@ -180,27 +167,22 @@ var ViewModel = function() {
 			});
 		});
 		list.categories(listCategories);
-		console.log('set');
 		if (self.initCategories) {
 			self.setCategoriesFromStorage();
 		};
 	};
 
 	this.setCategoriesFromStorage = function() {
-		console.log('storage');
 		var active = self.initCategories;
 		var activeIDs = [];
-		console.log(active);
 		active.forEach(function(activeLocation) {
 			activeIDs.push(activeLocation.id);
 		});
-		console.log(activeIDs);
 		self.currentList().categories().forEach(function(category) {
 			if (!activeIDs.includes(category.id)) {
 				category.active(false);
 			};
 		});
-		console.log(self.currentList().categories());
 	};	
 
 	this.compute = function() {
@@ -211,11 +193,6 @@ var ViewModel = function() {
 		}, this);
 
 		self.activeCategories = ko.computed(function() {
-			// console.log(ko.computedContext.isInitial());
-			// if (localStorage.activeCategories && ko.computedContext.isInitial()) {
-			// 	self.setCategoriesFromStorage();
-			// };.
-
 			if (self.currentList() && self.currentList().categories()) {
 				var activeCategories = [];
 				self.currentList().categories().forEach(function(category) {
@@ -223,9 +200,6 @@ var ViewModel = function() {
 						activeCategories.push(category);
 					};
 				});
-				console.log('calc');
-				console.log(activeCategories);
-				// localStorage.activeCategories = JSON.stringify(activeCategories);
 				localStorage.setItem(self.currentList().id, JSON.stringify(activeCategories));
 				return activeCategories;
 			};
@@ -300,39 +274,35 @@ var ViewModel = function() {
 		});
 
 	};
-
 	this.hideMarkers = function () {
 		self.currentList().locations().forEach(function(location) {
 			location.marker().setMap(null);
 		});
 		viewMap.resetBounds();
 	};
-
 	this.setTravelMode = function (mode) {
 		self.currentTravelMode(mode);
 		self.getDistance();
 	};
-	
-	this.shouldListLocations = ko.observable(false);
-
 	this.toggleListLocations = function() {
 		self.shouldListLocations(!self.shouldListLocations());
 	};
-
 	this.toggleCategory = function(category) {
-		
 		category.active(!category.active());
-		console.log('toggle');
-		console.log(self.currentList().categories());
-		console.log(self.currentCategories());
-		console.log(self.activeCategories());
-		// var id = self.currentList().id;
-		// localStorage.activeCategories = JSON.stringify({ id: self.activeCategories() });
-
 	};
 	this.toggleGPS = function() {
-		self.gpsStatus(!self.gpsStatus());
+		self.gpsStatus(null);
 		viewMap.toggleGPS();
+	};
+	this.gpsCallback = function(geoPosition) {
+		self.currentPosition(geoPosition);
+		self.gpsStatus(true);
+	};
+	this.gpsErrorEvent = function() {
+		if (self.gpsStatus() !== false) {
+			self.gpsStatus(false);
+			self.openModal("GPS service unavailable. Please try again later.");
+		};
 	};
 	this.getDistance = function() {
 		if (self.currentPosition()) {
@@ -343,13 +313,13 @@ var ViewModel = function() {
 	};
 	this.setDistance = function(location, result) {
 		if (result.status !== 'OK') {
-			location.distance({text: "No route found"})
+			// location.distance({text: "No route found", value: null});
+			// location.duration({text: "No route found", value: null});
 		} else {
 			location.duration(result.duration);
 			location.distance(result.distance);
 		};
 	};
-
 	this.openInfoWindow = function(location) {
 		if (self.searchQuery()) {
 			self.searchQuery(null);
@@ -361,15 +331,11 @@ var ViewModel = function() {
 	};
 	this.orderBy = function(order) {
 		if (order.mode !== 'rating' & !self.gpsStatus()) {
-			// create modal here
-			alert('Please turn on GPS');
+			self.openModal('Please turn on GPS');
 		} else {
 			self.currentOrder(order);
 		};
 	};
-
-	this.shouldShowDirections = ko.observable(false);
-
 	this.getDirections = function(location) {
 		if (!self.gpsStatus()) {
 			self.toggleGPS();
@@ -381,12 +347,12 @@ var ViewModel = function() {
 	};
 	this.directionsCallback = function(status) {
 		if (status !== 'OK') {
-			// create modal here
 			if (status === "ZERO_RESULTS") {
-				console.log("Couldn't create a route. Try different transport mode.");
+				self.openModal("Couldn't create a route. Try different transport mode.");
 			} else {
-				console.log("Directions are not available at the moment");
+				self.openModal("Directions are not available at the moment");
 			}
+			self.closeDirectionsCallback();
 		}
 	};
 	this.closeDirections = function() {
@@ -408,14 +374,18 @@ var ViewModel = function() {
 	// 	'&product_id=a1111c8c-c720-46c3-8534-2fcdd730040d'
 	// 	'&link_text=View%20team%20roster'
 	// 	'&partner_deeplink=partner%3A%2F%2Fteam%2F9383';
-
 	// };
-
-	
-
+	this.openModal = function(message) {
+		self.modalText(message);
+		FoundationView.toggleModal();
+	};
+	this.closeModal = function() {
+		self.modalText('');
+		FoundationView.toggleModal();
+	}
 	this.start();
-
 };
+
 
 var FoundationView = {
 	init: function() {
@@ -423,8 +393,12 @@ var FoundationView = {
 	},
 	toggleMenu: function() {
 		$('#offCanvas').foundation('close');
+	},
+	toggleModal: function() {
+		$('#modal').foundation('toggle');
 	}
 };
+
 
 var viewModel = new ViewModel();
 

@@ -100,7 +100,7 @@
                       <span class="badge" data-bind="text: $data.rating ? $data.rating : 'Ø'"></span>
                       <a class="title" data-bind="text: '' + $data.name, click: $parent.openInfoWindow"></a>
                     </div>
-                    <div class="shrink cell text-right" data-bind="text: ($data.duration() && $data.distance()) ? ($parent.currentOrder().mode === 'distance' ? $data.distance().text : $data.duration().text) : ''"></div>
+                    <div class="shrink cell text-right" data-bind="text: ($data.duration() && $data.distance()) ? ($parent.currentOrder().mode === 'distance' ? $data.distance().text : $data.duration().text) : 'No route found'"></div>
                   </li>
                 </ul>
               </div>
@@ -124,7 +124,7 @@
             <span class="badge" data-bind="visible: rating, text: rating"></span>
           </div>
           </div>
-          <div class="cell h6" data-bind="text: (duration() && distance()) ? (distance().text + ' - ' + duration().text) : ''"></div>
+          <div class="cell h6" data-bind="text: (duration() && distance()) ? (distance().text + ' - ' + duration().text) : 'No route found'"></div>
 
           <div class="cell grid-x button-group tiny" data-bind="foreach: categories()">
             <div class="cell button shrink" data-bind="text: shortName"></div>
@@ -138,6 +138,14 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="reveal tiny" id="modal" data-reveal>
+      <!-- <h1>Awesome. I Have It.</h1> -->
+      <p class="lead" data-bind="text: modalText()"></p>
+      <!-- <p>I'm a cool paragraph that lives inside of an even cooler modal. Wins!</p> -->
+      <button class="close-button" data-close aria-label="Close modal" type="button">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
