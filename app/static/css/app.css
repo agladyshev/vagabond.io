@@ -7,6 +7,11 @@ body {
   font-family: 'Josefin Sans', sans-serif;
 }
 
+  
+.no-js .dynamic-content { 
+  display: none; 
+}
+
 .map, .off-canvas-wrapper {
   height: 100%;
 }

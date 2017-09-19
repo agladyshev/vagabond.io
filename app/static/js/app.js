@@ -115,7 +115,9 @@ var ViewModel = function() {
 
 		if (localStorage.initList) {
 			self.initList = JSON.parse(localStorage.initList);
-			self.initCategories = JSON.parse(localStorage[self.initList.id]);
+			if (localStorage[self.initList.id]) {
+				self.initCategories = JSON.parse(localStorage[self.initList.id]);
+			};
 		};
 
 		// Set default list and get initial data
@@ -130,6 +132,7 @@ var ViewModel = function() {
 		};
 
 		self.compute();
+		FoundationView.showDynamic();
 	};
 
 	this.setCurrentList = function (list) {
@@ -208,9 +211,11 @@ var ViewModel = function() {
 						activeCategories.push(category);
 					};
 				});
-				localStorage.setItem(self.currentList().id, JSON.stringify(activeCategories));
-				console.log(JSON.stringify(activeCategories));
-				console.log(localStorage[self.currentList().id]);
+				if (self.currentList().categories().length) {
+					// We check if list categories are initialized
+					// then we update localstorage
+					localStorage.setItem(self.currentList().id, JSON.stringify(activeCategories));
+				}
 				return activeCategories;
 			};
 		}, this);
@@ -406,6 +411,9 @@ var FoundationView = {
 	},
 	toggleModal: function() {
 		$('#modal').foundation('toggle');
+	},
+	showDynamic: function() {
+		$("body").toggleClass('no-js');
 	}
 };
 
@@ -419,3 +427,4 @@ ko.applyBindings(viewModel);
 
 // Foundation is initialized after bindings to map events to knockout created elements
 FoundationView.init();
+
