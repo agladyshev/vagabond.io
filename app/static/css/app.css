@@ -65,6 +65,15 @@ body {
   margin: 0.2rem 0;
 }
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% {  transform: rotate(-359deg); }
+}
+
+.icon-spin {
+    animation: spin 2s linear infinite;
+}
+
   @media screen and (max-width: 40em) {
     .reveal {
         left: 10vw;

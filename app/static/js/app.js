@@ -98,10 +98,10 @@ var ViewModel = function() {
 		self.currentTravelMode = ko.observable( this.travelModes()[0] );
 		self.currentOrder = ko.observable( this.listOrders()[0] );
 
-		this.shouldListLocations = ko.observable(false);
-		this.shouldShowDirections = ko.observable(false);
-		this.gpsError = ko.observable(false);
-		// this.shouldShowModal = ko.observable(false);
+		self.isLoading = ko.observable(false);
+		self.shouldListLocations = ko.observable(false);
+		self.shouldShowDirections = ko.observable(false);
+		self.gpsError = ko.observable(false);
 		self.modalText = ko.observable('');
 
 		self.lists = ko.observableArray([]);
@@ -320,6 +320,7 @@ var ViewModel = function() {
 		};
 	};
 	this.getDistance = function() {
+		// self.isLoading(true);
 		if (self.currentPosition()) {
 			self.activeLocations().forEach(function(location) {
 				viewMap.getDistance(location, self.currentTravelMode().mode);
@@ -327,6 +328,7 @@ var ViewModel = function() {
 		};
 	};
 	this.setDistance = function(location, result) {
+		// self.isLoading(false);
 		if (result.status !== 'OK') {
 			// location.distance({text: "No route found", value: null});
 			// location.duration({text: "No route found", value: null});
@@ -352,6 +354,7 @@ var ViewModel = function() {
 		};
 	};
 	this.getDirections = function(location) {
+		self.isLoading(true);
 		if (!self.gpsStatus()) {
 			self.toggleGPS();
 		} else {
@@ -361,6 +364,7 @@ var ViewModel = function() {
 		
 	};
 	this.directionsCallback = function(status) {
+		self.isLoading(false);
 		if (status !== 'OK') {
 			if (status === "ZERO_RESULTS") {
 				self.openModal("Couldn't create a route. Try different transport mode.");
