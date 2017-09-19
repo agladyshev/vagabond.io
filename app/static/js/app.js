@@ -82,6 +82,7 @@ var Location = function(data) {
 var ViewModel = function() {
 	var self = this;
 
+	// hardcoded values
 	self.travelModes = ko.observableArray([
 			{title: "Walking", mode: "WALKING"},
 			{title: "Driving", mode: "DRIVING"},
@@ -97,12 +98,12 @@ var ViewModel = function() {
 
 
 	this.start = function() {
+		self.gpsStatus = ko.observable(false);
 		self.currentPosition = ko.observable();
 		self.currentPosition.subscribe(function(newPosition) {
 			self.getDistance();
 		});
-		self.gpsStatus = ko.observable(false);
-
+		
 		self.selectedLocation = ko.observable();
 		self.searchQuery = ko.observable();
 
@@ -116,18 +117,91 @@ var ViewModel = function() {
 			self.lists.push( new List(list) );
 		});
 
-		if (localStorage.currentList) {
-			var local = JSON.parse(localStorage.currentList);
+		// Get localstorage data before it is overwritten by computed variables
+		// !
+		// !
+		// !
+		// ! rewrite condition
+		if (localStorage.initList) {
+			self.initList = JSON.parse(localStorage.initList);
+			console.log(self.initList);
+			self.initCategories = JSON.parse(localStorage[self.initList.id]);
+			console.log(self.initCategories);
+		};
+
+		// Set default list and get initial data
+		if (self.initList) {
 			self.lists().forEach(function(list) {
-				if (list.id === local.id) {
+				if (list.id === self.initList.id) {
 					self.setCurrentList(list);
 				};
 			});
 		} else {
 			self.setCurrentList(self.lists()[0]);
 		};
+
 		self.compute();
 	};
+
+	this.setCurrentList = function (list) {
+		console.log('here');
+		if (self.currentList()) {
+			self.hideMarkers();
+			console.log('getinit');
+			if (localStorage[list.id]) {
+				self.initCategories = JSON.parse(localStorage[list.id]);
+			};
+		};
+		self.currentList(list);
+		self.getListData(list);
+		self.getDistance();
+		localStorage.initList = JSON.stringify(list);
+	};
+
+	this.getListData = function (list) {
+		$.getJSON(window.location.href + "api/v1.0/list/"
+				+ list.id, function(data) {
+					data.response.list.listItems.items.forEach(function (location) {
+						list.locations.push( new Location(location.venue) );
+			});
+			self.setListCategories(list);
+		});
+	};
+
+	this.setListCategories = function(list) {
+		var listCategories = [];
+		var index = [];
+		list.locations().forEach(function(location) {
+			location.categories().forEach(function(category) {
+				if (index.indexOf(category.id) === - 1) {
+					listCategories.push(category);
+					index.push(category.id);
+				};
+			});
+		});
+		list.categories(listCategories);
+		console.log('set');
+		if (self.initCategories) {
+			self.setCategoriesFromStorage();
+		};
+	};
+
+	this.setCategoriesFromStorage = function() {
+		console.log('storage');
+		var active = self.initCategories;
+		var activeIDs = [];
+		console.log(active);
+		active.forEach(function(activeLocation) {
+			activeIDs.push(activeLocation.id);
+		});
+		console.log(activeIDs);
+		self.currentList().categories().forEach(function(category) {
+			if (!activeIDs.includes(category.id)) {
+				category.active(false);
+			};
+		});
+		console.log(self.currentList().categories());
+	};	
 
 	this.compute = function() {
 		self.currentCategories = ko.computed(function() {
@@ -152,6 +226,7 @@ var ViewModel = function() {
 				console.log('calc');
 				console.log(activeCategories);
 				// localStorage.activeCategories = JSON.stringify(activeCategories);
+				localStorage.setItem(self.currentList().id, JSON.stringify(activeCategories));
 				return activeCategories;
 			};
 		}, this);
@@ -224,65 +299,6 @@ var ViewModel = function() {
 			}
 		});
 
-	};
-
-	this.setListCategories = function(list) {
-		var listCategories = [];
-		var index = [];
-		list.locations().forEach(function(location) {
-			location.categories().forEach(function(category) {
-				if (index.indexOf(category.id) === - 1) {
-					listCategories.push(category);
-					index.push(category.id);
-				}		
-			});
-		});
-		list.categories(listCategories);
-		console.log('set');
-		if (localStorage.activeCategories) {
-			self.setCategoriesFromStorage();
-		};
-	};
-
-	this.setCategoriesFromStorage = function() {
-		console.log('storage');
-		var active = JSON.parse(localStorage.activeCategories);
-		var activeIDs = [];
-		console.log(active);
-		active.forEach(function(activeLocation) {
-			activeIDs.push(activeLocation.id);
-		});
-		console.log(activeIDs);
-		self.currentList().categories().forEach(function(category) {
-			if (!activeIDs.includes(category.id)) {
-				category.active(false);
-			};
-		});
-		console.log(self.currentList().categories());
-	};
-
-	this.setCurrentList = function (list) {
-		console.log('here');
-		if (self.currentList()) {
-			self.hideMarkers();
-		};
-		self.currentList(list);
-		self.getListData(list);
-		self.getDistance();
-		localStorage.currentList = JSON.stringify(list);
-		console.log(list);
-		console.log(self.currentList());
-	};
-
-	this.getListData = function (list) {
-
-		$.getJSON(window.location.href + "api/v1.0/list/"
-				+ list.id, function(data) {
-					data.response.list.listItems.items.forEach(function (location) {
-						list.locations.push( new Location(location.venue) );
-			});
-			self.setListCategories(list);
-		});
 	};
 
 	this.hideMarkers = function () {
