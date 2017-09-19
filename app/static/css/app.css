@@ -34,6 +34,7 @@ body {
 
 .position-bottom {
   height: auto;
+  min-height: 10rem;
 }
 
 .menu {

@@ -146,13 +146,21 @@ var ViewModel = function() {
 	};
 
 	this.getListData = function (list) {
-		$.getJSON(window.location.href + "api/v1.0/list/"
-				+ list.id, function(data) {
+		var callServer = $.ajax(window.location.href + "api/v1.0/list/" + list.id)
+			.done(function(response) {
+				var data = JSON.parse(response);
+				if (!data.response.list) {
+					self.openModal("Couldn't get location data from Foursquare. We'll sort this situation shortly.");
+				} else {
 					data.response.list.listItems.items.forEach(function (location) {
 						list.locations.push( new Location(location.venue) );
+					});
+					self.setListCategories(list);
+				};
+			})
+			.fail(function() {
+				self.openModal("Couldn't get location data from Foursquare. We'll sort this situation shortly.");
 			});
-			self.setListCategories(list);
-		});
 	};
 
 	this.setListCategories = function(list) {
@@ -201,6 +209,8 @@ var ViewModel = function() {
 					};
 				});
 				localStorage.setItem(self.currentList().id, JSON.stringify(activeCategories));
+				console.log(JSON.stringify(activeCategories));
+				console.log(localStorage[self.currentList().id]);
 				return activeCategories;
 			};
 		}, this);
