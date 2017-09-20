@@ -172,7 +172,7 @@ var ViewModel = function () {
             return;
         }
         // else get data from server
-        var callServer = $.ajax(window.location.href + "api/v1.0/list/" + list.id)
+        $.ajax(window.location.href + "api/v1.0/list/" + list.id)
             .done(function (response) {
                 var data = JSON.parse(response);
                 if (!data.response.list) {
@@ -274,16 +274,12 @@ var ViewModel = function () {
                     // var direction = self.currentOrder().direction;
                     if (mode !== 'rating' && left[mode]() && right[mode]()) {
                         // Check if value has been already assigned
-                        return left[mode]().value === right[mode]().value
-                            ? 0
-                            : (left[mode]().value < right[mode]().value
-                                ? -1
+                        return left[mode]().value === right[mode]().value ? 0
+                            : (left[mode]().value < right[mode]().value ? -1
                                 : 1);
                     } else {
-                        return left[mode] === right[mode]
-                            ? 0
-                            : (left[mode] > right[mode]
-                                ? -1
+                        return left[mode] === right[mode] ? 0
+                            : (left[mode] > right[mode] ? -1
                                 : 1);
                     }
                 });
@@ -369,10 +365,10 @@ var ViewModel = function () {
                                 found = property;
                             } else if (properties[property].matches === max) {
                                 match = property;
-                            };
+                            }
                             properties[property].matches = 0;
-                        };
-                    };
+                        }
+                    }
                     if (found && !match) {
                         properties[property].found = true;
                     }
