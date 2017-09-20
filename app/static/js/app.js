@@ -1,4 +1,6 @@
 var initialLists = [
+	// To retrieve Foursquare list id, call User endpoint with author ID
+	// For future: retrieve lists if user log in with Foursquare account
 	{
 		title: "Yerevan",
 		id: "59b9524b95a722030778d8ed"
@@ -39,6 +41,7 @@ var Location = function(data) {
 	this.rating = data.rating;
 	this.address = data.location.address;
 	this.LatLng = {lat: data.location.lat, lng: data.location.lng};
+	// Fousquare's venue can be tagged by multiple categories
 	this.categories = ko.computed(function() {
 		var categories = [];
 		data.categories.forEach(function (category) {
@@ -46,7 +49,6 @@ var Location = function(data) {
 		});
 		return categories;
 	}, this);
-
 	self.marker = ko.computed(function() {
 		if (viewMap.map) {
 			var marker =  new google.maps.Marker({
@@ -67,7 +69,6 @@ var Location = function(data) {
 			return marker;
 		}
 	}, this);
-
 	this.distance = ko.observable();
 	this.duration = ko.observable();
 };
@@ -76,7 +77,6 @@ var Location = function(data) {
 var ViewModel = function() {
 	var self = this;
 
-	// hardcoded values
 	self.travelModes = ko.observableArray([
 			{title: "Walking", mode: "WALKING"},
 			{title: "Driving", mode: "DRIVING"},
@@ -93,19 +93,20 @@ var ViewModel = function() {
 
 	this.start = function() {
 		self.gpsStatus = ko.observable(null);
+		// gpsStatus has three possible values:
+		// true when set, false if there is an error, null if undefined
 		self.currentPosition = ko.observable(null);
-		self.currentPosition.subscribe(function(newPosition) {
-			self.getDistance();
-		});
-
+		// self.currentPosition.subscribe(function(newPosition) {
+		// 	self.getDistance();
+		// });
 		
 		self.selectedLocation = ko.observable();
 		self.searchQuery = ko.observable();
 
-
 		self.currentTravelMode = ko.observable( this.travelModes()[0] );
 		self.currentOrder = ko.observable( this.listOrders()[0] );
 
+		// isLoading toggles loading spinner for directions call
 		self.isLoading = ko.observable(false);
 		self.shouldListLocations = ko.observable(false);
 		self.shouldShowDirections = ko.observable(false);
@@ -137,12 +138,13 @@ var ViewModel = function() {
 		} else {
 			self.setCurrentList(self.lists()[0]);
 		};
-
+		// Load computed variables
 		self.compute();
 		FoundationView.showDynamic();
 	};
 
 	this.setCurrentList = function (list) {
+		// If we change lists
 		if (self.currentList()) {
 			self.hideMarkers(self.currentList());
 			
@@ -150,11 +152,12 @@ var ViewModel = function() {
 				self.initCategories = JSON.parse(localStorage[list.id]);
 			};
 		};
+		// Always
 		self.currentList(list);
+		self.getListData(list);
 		if (viewMap.geoPosition) {
 			self.getDistance();
 		};
-		self.getListData(list);
 		localStorage.initList = JSON.stringify(list);
 	};
 
@@ -164,6 +167,7 @@ var ViewModel = function() {
 			self.setListCategories(list);
 			return;
 		};
+		// else get data from server
 		var callServer = $.ajax(window.location.href + "api/v1.0/list/" + list.id)
 			.done(function(response) {
 				var data = JSON.parse(response);
@@ -184,6 +188,8 @@ var ViewModel = function() {
 	this.setListCategories = function(list) {
 		var listCategories = [];
 		var index = [];
+		// List categories are created from categories mentioned in list locations
+		// Therefore function checks if category is unique
 		list.locations().forEach(function(location) {
 			location.categories().forEach(function(category) {
 				if (index.indexOf(category.id) === - 1) {
@@ -193,12 +199,14 @@ var ViewModel = function() {
 			});
 		});
 		list.categories(listCategories);
+		// If localstorage contains data about active categories, load it
 		if (self.initCategories) {
 			self.setCategoriesFromStorage();
 		};
 	};
 
 	this.setCategoriesFromStorage = function() {
+		// LocalStorage contains active categories from last session
 		var active = self.initCategories;
 		var activeIDs = [];
 		active.forEach(function(activeLocation) {
@@ -212,16 +220,15 @@ var ViewModel = function() {
 	};	
 
 	this.compute = function() {
+		// All the computed observables
 		self.positionMarker = ko.computed(function() {
-			// Test if it is reevaluated when location change
 			if (self.currentPosition()) {
 				var marker = new google.maps.Marker({
 					position: {lat: viewMap.geoPosition.coords.latitude, lng: viewMap.geoPosition.coords.longitude},
 					icon: {
 						path: google.maps.SymbolPath.CIRCLE,
 						strokeColor: '#2ba6cb',
-						scale: 7,
-
+						scale: 7
 					},
 					animation: google.maps.Animation.DROP,
 					title: 'Your location'
@@ -237,8 +244,8 @@ var ViewModel = function() {
 				return self.currentList().categories();
 			};
 		}, this);
-
 		self.activeCategories = ko.computed(function() {
+			// Filter categories selected by user
 			if (self.currentList() && self.currentList().categories()) {
 				var activeCategories = [];
 				self.currentList().categories().forEach(function(category) {
@@ -247,15 +254,16 @@ var ViewModel = function() {
 					};
 				});
 				if (self.currentList().categories().length) {
-					// We check if list categories are initialized
+					// We check if list categories are already initialized
 					// then we update localstorage
+					// otherwise we might push empty values
 					localStorage.setItem(self.currentList().id, JSON.stringify(activeCategories));
 				}
 				return activeCategories;
 			};
 		}, this);
-
 		self.sortedLocations = ko.computed(function() {
+			// Sort locations by current sorting order
 			if (self.currentList()){
 				return self.currentList().locations().sort(function (left, right) { 
 					var mode = self.currentOrder().mode;
@@ -269,39 +277,38 @@ var ViewModel = function() {
 				});
 			};
 		}, this);
-
 		self.activeLocations = ko.computed(function() {
+			// Active locations have at least one active category
 			var activeLocations = [];
 			var positions = [];
 			self.sortedLocations().forEach(function(location) {
-				// Possibly need a check if marker is initialised
-				// location.marker().setMap(null);
 				location.categories().forEach(function(locationCat) {
 					self.activeCategories().forEach(function(category) {
 						if (category.id === locationCat.id) {
 							activeLocations.push(location);
-							// location.marker().setMap(viewMap.map);
 							positions.push(location.marker().getPosition());
 						};
 					});
 				});
 			});
+			// If user locations is set, add it to positions array to set new map bounds
 			if (self.currentPosition()) {
 				positions.push(self.positionMarker().getPosition());
 			};
-
+			// Computed observables first evaluated before map is loaded
 			if (typeof viewMap.bounds !== 'undefined') {
 				viewMap.fitBounds(positions);
 			};
 			self.showMarkers(activeLocations);
 			return activeLocations;
 		}, this);
-
 		self.searchResults = ko.computed(function() {
+			// Calculate possible locations based on user string in search
 			var searchItems;
 			var filteredLocations = [];
 			if (self.searchQuery()) {
 				searchItems = self.searchQuery().toLowerCase().split(' ', 3);
+				// App use only first 3 substrings: possibly name, address and category
 				self.currentList().locations().forEach(function(location) {
 					searchItems.forEach(function(item) {
 						if (location.name.toLowerCase().includes(item)) {
@@ -318,7 +325,6 @@ var ViewModel = function() {
 								return;
 							};
 						});
-
 					});
 				});
 				if (filteredLocations.length) {
@@ -337,6 +343,8 @@ var ViewModel = function() {
 		// viewMap.resetBounds();
 	};
 	this.showMarkers = function (newList) {
+		// When new list is loaded, hide all markers and load new
+		// Most tasks are async, so have to make sure only current markers are loaded
 		self.lists().forEach(function(list) {
 			self.hideMarkers(list);
 		});
@@ -361,15 +369,18 @@ var ViewModel = function() {
 	this.gpsCallback = function(geoPosition) {
 		self.currentPosition(geoPosition);
 		self.gpsStatus(true);
+		self.getDistance();
 	};
 	this.gpsErrorEvent = function() {
+		// GPS service makes several attempts to get locations
+		// User gets error message only once
 		if (self.gpsStatus() !== false) {
 			self.gpsStatus(false);
 			self.openModal("GPS service unavailable. Please try again later.");
 		};
 	};
 	this.getDistance = function() {
-		// self.isLoading(true);
+		// Call map view to calculate distance / duration for every location
 		if (self.currentPosition()) {
 			self.activeLocations().forEach(function(location) {
 				viewMap.getDistance(location, self.currentTravelMode().mode);
@@ -377,7 +388,7 @@ var ViewModel = function() {
 		};
 	};
 	this.setDistance = function(location, result) {
-		// self.isLoading(false);
+		// Callback function, sets distance/duration for location
 		if (result.status !== 'OK') {
 			// location.distance({text: "No route found", value: null});
 			// location.duration({text: "No route found", value: null});
@@ -469,6 +480,7 @@ var FoundationView = {
 		$('#modal').foundation('toggle');
 	},
 	showDynamic: function() {
+		// To prevent SFOUC on load
 		$("body").toggleClass('no-js');
 	}
 };

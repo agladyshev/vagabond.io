@@ -53,8 +53,6 @@ body {
   margin-left: 1rem;
 }
 
-
-
 .list-locations, .search-results {
   max-height: 30vh;
   overflow-y: scroll;

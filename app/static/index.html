@@ -32,16 +32,14 @@
               </div>
             </div>
           </div>
-          <div class="search-results" data-bind="visible: searchQuery()">
-            <div class="dropdown-pane">
-              <div data-bind="foreach: searchResults()">
-                <div class="grid-x">
-                  <div class="auto cell">
-                    <span class="badge" data-bind="text: rating ? rating : 'Ø'"></span>
-                    <a class="title" data-bind="text: '' + name, click: $parent.openInfoWindow"></a>
-                  </div>
-                  <div class="shrink cell text-right" data-bind="text: (duration() && distance()) ? ($parent.currentOrder().mode === 'distance' ? distance().text : duration().text) : ''"></div>
+          <div class="dropdown-pane search-results dynamic-content" data-bind="visible: searchQuery()">
+            <div data-bind="foreach: searchResults()">
+              <div class="grid-x">
+                <div class="auto cell">
+                  <span class="badge" data-bind="text: rating ? rating : 'Ø'"></span>
+                  <a data-bind="text: '' + name, click: $parent.openInfoWindow"></a>
                 </div>
+                <div class="shrink cell text-right" data-bind="text: (duration() && distance()) ? ($parent.currentOrder().mode === 'distance' ? distance().text : duration().text) : ''"></div>
               </div>
             </div>
             <div data-bind="text: 'no results', visible: !searchResults()"></div>
