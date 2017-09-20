@@ -305,34 +305,73 @@ var ViewModel = function() {
 		self.searchResults = ko.computed(function() {
 			// Calculate possible locations based on user string in search
 			var searchItems;
+			var initialLocations = self.currentList().locations();
 			var filteredLocations = [];
 			if (self.searchQuery()) {
 				searchItems = self.searchQuery().toLowerCase().split(' ', 3);
 				// App use only first 3 substrings: possibly name, address and category
-				self.currentList().locations().forEach(function(location) {
-					searchItems.forEach(function(item) {
-						if (location.name.toLowerCase().includes(item)) {
+
+				var properties = {
+					"name": {"found": false, "matches": 0},
+					"address": {"found": false, "matches": 0},
+					"cat": {"found": false, "matches": 0}
+				};
+
+				searchItems.forEach(function(item) {
+					// We filter results by each added substring	
+					filteredLocations = [];
+					initialLocations.forEach(function(location) {
+						if (!properties.name.found && location.name.toLowerCase().includes(item)) {
 							filteredLocations.push(location);
+							properties.name.matches+=1;
 							return;
 						};
-						if (location.address && location.address.toLowerCase().includes(item)) {
+						if (!properties.address.found  && location.address && location.address.toLowerCase().includes(item)) {
 							filteredLocations.push(location);
+							properties.address.matches+=1;
 							return;
 						};
-						location.categories().forEach(function(category) {
-							if (category.name.toLowerCase().includes(item)) {
-								filteredLocations.push(location)
-								return;
-							};
-						});
+						if (!properties.cat.found) {
+							location.categories().forEach(function(category) {
+								if (category.name.toLowerCase().includes(item)) {
+									filteredLocations.push(location)
+									properties.cat.matches+=1;
+									return;
+								};
+							});
+						}
 					});
+					initialLocations = filteredLocations;
+
+					// If one property is mentioned in most filtered results
+					// The next round ignores it
+
+					var big = 0;
+					var found = '';
+					var match = '';
+
+					for (var property in properties) {
+						if (properties.hasOwnProperty(property)) {
+							if (properties[property].matches > big) {
+								big = properties[property].matches;
+								found = property;
+							} else if (properties[property].matches === big) {
+								match = property;
+							};
+							properties[property].matches = 0;
+						};
+					};
+					if (found && !match) {
+						properties[property].found = true;
+					};
 				});
+
 				if (filteredLocations.length) {
 					return filteredLocations;
 				} else {
 					return null;
-				}
-			}
+				};
+			};
 		});
 
 	};
