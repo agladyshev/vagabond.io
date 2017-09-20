@@ -52,10 +52,17 @@ var Location = function(data) {
 			var marker =  new google.maps.Marker({
 				// icon: image,
 				position: self.LatLng,
-				// animation: google.maps.Animation.DROP
+				animation: google.maps.Animation.DROP,
+				title: self.name
 				});
 			marker.addListener('click', function() {
 				viewModel.openInfoWindow(self);
+			});
+			marker.addListener('click', function() {
+				marker.setAnimation(google.maps.Animation.BOUNCE);
+				setTimeout(function() {
+					marker.setAnimation(null);
+				}, 1400);
 			});
 			return marker;
 		}
@@ -90,6 +97,7 @@ var ViewModel = function() {
 		self.currentPosition.subscribe(function(newPosition) {
 			self.getDistance();
 		});
+
 		
 		self.selectedLocation = ko.observable();
 		self.searchQuery = ko.observable();
@@ -142,8 +150,10 @@ var ViewModel = function() {
 			};
 		};
 		self.currentList(list);
+		if (geoPosition) {
+			self.getDistance();
+		};
 		self.getListData(list);
-		self.getDistance();
 		localStorage.initList = JSON.stringify(list);
 	};
 
@@ -196,6 +206,26 @@ var ViewModel = function() {
 	};	
 
 	this.compute = function() {
+		self.positionMarker = ko.computed(function() {
+			// Test if it is reevaluated when location change
+			if (self.currentPosition()) {
+				var marker = new google.maps.Marker({
+					position: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
+					icon: {
+						path: google.maps.SymbolPath.CIRCLE,
+						strokeColor: '#2ba6cb',
+						scale: 7,
+
+					},
+					animation: google.maps.Animation.DROP,
+					title: 'Your location'
+				});
+				marker.setMap(map);
+				return marker;
+			} else {
+				return null;
+			};
+		});
 		self.currentCategories = ko.computed(function() {
 			if (self.currentList()) {
 				return self.currentList().categories();
@@ -238,6 +268,7 @@ var ViewModel = function() {
 			var activeLocations = [];
 			var positions = [];
 			self.sortedLocations().forEach(function(location) {
+				// Possibly need a chek if marker is initialised
 				location.marker().setMap(null);
 				location.categories().forEach(function(locationCat) {
 					self.activeCategories().forEach(function(category) {
@@ -249,6 +280,10 @@ var ViewModel = function() {
 					});
 				});
 			});
+			if (self.currentPosition()) {
+				positions.push(self.positionMarker().getPosition());
+			};
+
 			if (typeof bounds !== 'undefined') {
 				viewMap.fitBounds(positions);
 			};
