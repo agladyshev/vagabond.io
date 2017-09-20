@@ -437,12 +437,12 @@ var ViewModel = function() {
 		};
 	};
 	this.openInfoWindow = function(location) {
+		// Empty search query if link opened from search results
 		if (self.searchQuery()) {
 			self.searchQuery(null);
 		};
 		self.selectedLocation(location);
 		viewMap.openInfoWindow(location);
-
 		FoundationView.toggleMenu();
 	};
 	this.orderBy = function(order) {
@@ -459,8 +459,7 @@ var ViewModel = function() {
 		} else {
 			viewMap.getDirections(location, self.currentTravelMode().mode);
 			self.shouldShowDirections(true);
-		}
-		
+		};
 	};
 	this.directionsCallback = function(status) {
 		self.isLoading(false);
@@ -496,7 +495,9 @@ var ViewModel = function() {
 	// 	'&link_text=View%20team%20roster'
 	// 	'&partner_deeplink=partner%3A%2F%2Fteam%2F9383';
 	// };
+
 	this.openModal = function(message) {
+		// Opens modal for warnings and error messages for user
 		self.modalText(message);
 		FoundationView.toggleModal();
 	};
@@ -513,13 +514,15 @@ var FoundationView = {
 		$(document).foundation();
 	},
 	toggleMenu: function() {
+		// Toggle the bottom menu
 		$('#offCanvas').foundation('close');
 	},
 	toggleModal: function() {
+		// Opens modal window
 		$('#modal').foundation('toggle');
 	},
 	showDynamic: function() {
-		// To prevent SFOUC on load
+		// Prevents SFOUC on load
 		$("body").toggleClass('no-js');
 	}
 };
