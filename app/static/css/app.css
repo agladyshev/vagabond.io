@@ -39,8 +39,11 @@ body {
 
 .position-bottom {
   height: auto;
-  min-height: 10rem;
 }
+
+/*.dropdown .is-dropdown-submenu a {
+  padding: 0.2rem 0.2rem;
+}*/
 
 .menu {
   font-size: 12px;
@@ -49,6 +52,8 @@ body {
 .title-bar .menu-icon {
   margin-left: 1rem;
 }
+
+
 
 .list-locations, .search-results {
   max-height: 30vh;
@@ -74,6 +79,14 @@ body {
     animation: spin 2s linear infinite;
 }
 
+.attribution {
+  font-size: 0.6rem;
+}
+
+.menu-bottom {
+  min-height: 12rem;
+}
+
   @media screen and (max-width: 40em) {
     .reveal {
         left: 10vw;
@@ -86,7 +99,7 @@ body {
     }
     .infowindow-streetview {
       height: 30vh;
-    } 
+    }
   }
   @media screen and (min-width: 40em) {
 
@@ -95,5 +108,5 @@ body {
     }
     .infowindow-streetview {
       height: 25rem;
-    } 
+    }
   }

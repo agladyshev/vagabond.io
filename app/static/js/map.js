@@ -131,7 +131,7 @@ var ViewMap = function() {
 					position: nearStreetViewLocation,
 					pov: {
 						heading: heading,
-						pitch: 30
+						pitch: 0
 					}
 				};
 
