@@ -1,11 +1,13 @@
-var map;
-var bounds;
-var infowindow;
-var geoPosition;
-var directionsDisplay;
+var ViewMap = function() {
+	var self = this;
 
-var viewMap = {
-	init: function() {
+	this.map;
+	this.bounds;
+	this.infowindow;
+	this.geoPosition;
+	this.directionsDisplay;
+
+	this.init = function() {
 		var styles = [
 		{
 			"featureType": "administrative",
@@ -89,32 +91,32 @@ var viewMap = {
 			]
 		}];
 
-		map = new google.maps.Map(document.getElementById('map'), {
+		self.map = new google.maps.Map(document.getElementById('map'), {
 			center: {lat: 40.179186, lng: 44.499103},
 			zoom: 12,
 			styles: styles,
 			disableDefaultUI: true
 		});
-		this.resetBounds();
-	},
-	resetBounds: function() {
-		bounds = new google.maps.LatLngBounds();
-	},
-	fitBounds: function(positions) {
-		this.resetBounds();
+		self.resetBounds();
+	};
+	this.resetBounds = function() {
+		self.bounds = new google.maps.LatLngBounds();
+	};
+	this.fitBounds = function(positions) {
+		self.resetBounds();
 		positions.forEach(function(position) {
-			bounds.extend(position);
+			self.bounds.extend(position);
 		});
-		map.fitBounds(bounds);
-	},
-	resumeBounds: function() {
-		if (bounds) {
-			map.fitBounds(bounds);
+		self.map.fitBounds(self.bounds);
+	};
+	this.resumeBounds = function() {
+		if (self.bounds) {
+			self.map.fitBounds(self.bounds);
 		}
-	},
-	openInfoWindow: function(location) {
+	};
+	this.openInfoWindow = function(location) {
 
-		this.closeInfoWindow();
+		self.closeInfoWindow();
 
 		var streetViewService = new google.maps.StreetViewService();
 		var radius = 50;
@@ -140,24 +142,24 @@ var viewMap = {
 				document.getElementById('pano').classList.toggle("infowindow-streetview");
 			};
 		};
-		if (!infowindow) {
-			infowindow = new google.maps.InfoWindow({});
-			infowindow.setContent(document.getElementById('info-content'));
+		if (!self.infowindow) {
+			self.infowindow = new google.maps.InfoWindow({});
+			self.infowindow.setContent(document.getElementById('info-content'));
 		};
 		
 		streetViewService.getPanoramaByLocation(location.marker().position, radius, getStreetView);
 
-		infowindow.open(map, location.marker());
-	},
-	closeInfoWindow: function() {
-		if (infowindow) {
-			infowindow.marker = null;
-			infowindow.close();
+		self.infowindow.open(self.map, location.marker());
+	};
+	this.closeInfoWindow = function() {
+		if (self.infowindow) {
+			self.infowindow.marker = null;
+			self.infowindow.close();
 		};
-	},
-	toggleGPS: function() {
-		if (geoPosition) {
-			geoPosition = null;
+	};
+	this.toggleGPS = function() {
+		if (self.geoPosition) {
+			self.geoPosition = null;
 		} else {
 			var geoOptions = {
 				enableHighAccuracy: false,
@@ -165,9 +167,9 @@ var viewMap = {
 				maximumAge: 5 * 60 * 1000,
 			}
 			var geoSuccess = function(position) {
-				geoPosition = position;
-				viewModel.gpsCallback(geoPosition);
-				// viewModel.currentPosition(geoPosition);
+				self.geoPosition = position;
+				viewModel.gpsCallback(self.geoPosition);
+				// viewModel.currentPosition(self.geoPosition);
 			};
 			var geoError = function(error) {
 				viewModel.gpsErrorEvent();
@@ -181,12 +183,12 @@ var viewMap = {
 			};
 			navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
 		};
-	},
-	getDistance: function(location, travelMode) {
+	};
+	this.getDistance = function(location, travelMode) {
 		var result;
 		var distanceMatrixService = new google.maps.DistanceMatrixService;
 		distanceMatrixService.getDistanceMatrix({
-			origins: [{lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude}],
+			origins: [{lat: self.geoPosition.coords.latitude, lng: self.geoPosition.coords.longitude}],
 			destinations: [location.marker().position],
 			travelMode: travelMode,
 			unitSystem: google.maps.UnitSystem.METRIC,
@@ -198,29 +200,26 @@ var viewMap = {
 				viewModel.setDistance(location, response.rows[0].elements[0]);
 			}
 		});
-	},
-	getDirections: function(location, travelMode) {
-		// map.hideMarkers();
-		this.closeInfoWindow();
-		this.closeDirections();
-		if (!geoPosition) {
+	};
+	this.getDirections = function(location, travelMode) {
+		// self.map.hideMarkers();
+		self.closeInfoWindow();
+		self.closeDirections();
+		if (!self.geoPosition) {
 			viewModel.openModal("GPS service unavailable. Please try again later.");
 			viewModel.closeDirectionsCallback();
 		} else {
 			var directionsService = new google.maps.DirectionsService;
 			directionsService.route({
-			origin: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
+			origin: {lat: self.geoPosition.coords.latitude, lng: self.geoPosition.coords.longitude},
 			destination: location.marker().position,
 			travelMode: travelMode
 			}, function(response, status) {
 				if (status === google.maps.DirectionsStatus.OK) {
-					directionsDisplay = new google.maps.DirectionsRenderer({
-						map: map,
+					self.directionsDisplay = new google.maps.DirectionsRenderer({
+						map: self.map,
 						directions: response,
 						draggable: true,
-						// polylineOptions: {
-						// 	strokeColor: 'green'
-						// }
 					});
 				} else {
 					// window.alert('Directions request failed due to ' + status);
@@ -228,19 +227,15 @@ var viewMap = {
 				viewModel.directionsCallback(status);
 			});;
 		};
-	},
-	closeDirections: function() {
-		if (directionsDisplay) {
-			directionsDisplay.setMap(null);
+	};
+	this.closeDirections = function() {
+		if (self.directionsDisplay) {
+			self.directionsDisplay.setMap(null);
 			// directionsService.setMap(null);
 			// directionDisplay.set('directions', null);
 		};
 		viewModel.closeDirectionsCallback();
-	},
+	};
 };
 
-var initMap = function() {
-	viewMap.init();
-};
-
-
+var viewMap = new ViewMap();

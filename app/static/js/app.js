@@ -48,7 +48,7 @@ var Location = function(data) {
 	}, this);
 
 	self.marker = ko.computed(function() {
-		if (map) {
+		if (viewMap.map) {
 			var marker =  new google.maps.Marker({
 				// icon: image,
 				position: self.LatLng,
@@ -144,13 +144,14 @@ var ViewModel = function() {
 
 	this.setCurrentList = function (list) {
 		if (self.currentList()) {
-			self.hideMarkers();
+			self.hideMarkers(self.currentList());
+			
 			if (localStorage[list.id]) {
 				self.initCategories = JSON.parse(localStorage[list.id]);
 			};
 		};
 		self.currentList(list);
-		if (geoPosition) {
+		if (viewMap.geoPosition) {
 			self.getDistance();
 		};
 		self.getListData(list);
@@ -158,6 +159,11 @@ var ViewModel = function() {
 	};
 
 	this.getListData = function (list) {
+		// If list data has already been loaded, use it
+		if (list.locations().length) {
+			self.setListCategories(list);
+			return;
+		};
 		var callServer = $.ajax(window.location.href + "api/v1.0/list/" + list.id)
 			.done(function(response) {
 				var data = JSON.parse(response);
@@ -210,7 +216,7 @@ var ViewModel = function() {
 			// Test if it is reevaluated when location change
 			if (self.currentPosition()) {
 				var marker = new google.maps.Marker({
-					position: {lat: geoPosition.coords.latitude, lng: geoPosition.coords.longitude},
+					position: {lat: viewMap.geoPosition.coords.latitude, lng: viewMap.geoPosition.coords.longitude},
 					icon: {
 						path: google.maps.SymbolPath.CIRCLE,
 						strokeColor: '#2ba6cb',
@@ -220,7 +226,7 @@ var ViewModel = function() {
 					animation: google.maps.Animation.DROP,
 					title: 'Your location'
 				});
-				marker.setMap(map);
+				marker.setMap(viewMap.map);
 				return marker;
 			} else {
 				return null;
@@ -268,13 +274,13 @@ var ViewModel = function() {
 			var activeLocations = [];
 			var positions = [];
 			self.sortedLocations().forEach(function(location) {
-				// Possibly need a chek if marker is initialised
-				location.marker().setMap(null);
+				// Possibly need a check if marker is initialised
+				// location.marker().setMap(null);
 				location.categories().forEach(function(locationCat) {
 					self.activeCategories().forEach(function(category) {
 						if (category.id === locationCat.id) {
 							activeLocations.push(location);
-							location.marker().setMap(map);
+							// location.marker().setMap(viewMap.map);
 							positions.push(location.marker().getPosition());
 						};
 					});
@@ -284,9 +290,10 @@ var ViewModel = function() {
 				positions.push(self.positionMarker().getPosition());
 			};
 
-			if (typeof bounds !== 'undefined') {
+			if (typeof viewMap.bounds !== 'undefined') {
 				viewMap.fitBounds(positions);
 			};
+			self.showMarkers(activeLocations);
 			return activeLocations;
 		}, this);
 
@@ -323,11 +330,19 @@ var ViewModel = function() {
 		});
 
 	};
-	this.hideMarkers = function () {
-		self.currentList().locations().forEach(function(location) {
+	this.hideMarkers = function (list) {
+		list.locations().forEach(function(location) {
 			location.marker().setMap(null);
 		});
-		viewMap.resetBounds();
+		// viewMap.resetBounds();
+	};
+	this.showMarkers = function (newList) {
+		self.lists().forEach(function(list) {
+			self.hideMarkers(list);
+		});
+		newList.forEach(function(location) {
+			location.marker().setMap(viewMap.map);
+		});
 	};
 	this.setTravelMode = function (mode) {
 		self.currentTravelMode(mode);
@@ -466,6 +481,6 @@ ko.options.deferUpdates = true;
 
 ko.applyBindings(viewModel);
 
-// Foundation is initialized after bindings to map events to knockout created elements
+// Foundation is initialized after bindings
+// to map Foundation events to knockout created elements
 FoundationView.init();
-
