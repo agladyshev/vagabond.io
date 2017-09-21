@@ -138,14 +138,14 @@ var ViewMap = function () {
         div += (location.phone? '<a class="cell shrink button fi-telephone"> ' + location.phone + '</a>': '') + '</div>'
 
         return div;
-    }
+    };
     this.openInfoWindow = function (location) {
         self.closeInfoWindow();
-
-        var streetViewService = new google.maps.StreetViewService();
-        var radius = 50;
-
-        function getStreetView(data, status) {
+        if (!self.streetViewService) {
+            self.streetViewService = new google.maps.StreetViewService();
+            self.panoRadius = 50;
+        }
+        this.getStreetView = function (data, status) {
             if (status == google.maps.StreetViewStatus.OK) {
                 var nearStreetViewLocation = data.location.latLng;
                 var heading = google.maps.geometry.spherical.computeHeading(
@@ -159,27 +159,23 @@ var ViewMap = function () {
                         pitch: 0
                     }
                 };
-
-                var panorama = new google.maps.StreetViewPanorama(
+                self.panorama = new google.maps.StreetViewPanorama(
                     document.getElementById('pano'),
                     panoramaOptions
                 );
-
             } else {
                 document.getElementById('pano').classList.toggle("infowindow-streetview");
             }
-        }
-
+        };
         self.infowindow = new google.maps.InfoWindow({
             content: self.getInfoWindowContent(location)
             });
-
-        streetViewService.getPanoramaByLocation(location.marker().position, radius, getStreetView);
-
+        self.streetViewService.getPanoramaByLocation(location.marker().position, self.panoRadius, self.getStreetView);
         self.infowindow.open(self.map, location.marker());
     };
     this.updateInfoWindow = function(location) {
         self.infowindow.setContent(self.getInfoWindowContent(location));
+        self.streetViewService.getPanoramaByLocation(location.marker().position, self.panoRadius, self.getStreetView);
     };
     this.closeInfoWindow = function () {
         if (self.infowindow) {
