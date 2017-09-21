@@ -35,9 +35,9 @@
           <div class="dropdown-pane search-results dynamic-content" data-bind="visible: searchActive()">
             <div data-bind="foreach: searchResults()">
               <div class="grid-x">
-                <div class="auto cell">
+                <div class="auto cell" data-bind="">
                   <span class="badge" data-bind="text: rating ? rating : 'Ø'"></span>
-                  <a data-bind="text: '' + name, click: $parent.openInfoWindow"></a>
+                  <a data-bind="text: '' + name, click: viewModel.openInfoWindow"></a>
                 </div>
                 <div class="shrink cell text-right" data-bind="text: (duration() && distance()) ? ($parent.currentOrder().mode === 'distance' ? distance().text : duration().text) : ''"></div>
               </div>

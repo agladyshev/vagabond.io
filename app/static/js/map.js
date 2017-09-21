@@ -96,9 +96,9 @@ var ViewMap = function () {
         google.maps.event.addDomListener(window, 'resize', function() {
             viewModel.fitBounds();
         });
-        google.maps.event.addDomListener(mapDiv, 'click', function() {
-            viewModel.searchActive(false);
-        });
+        // google.maps.event.addDomListener(mapDiv, 'click', function() {
+        //     viewModel.searchActive(false);
+        // });
         viewModel.setMapReady();
     };
     this.resetBounds = function () {

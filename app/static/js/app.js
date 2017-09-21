@@ -62,10 +62,7 @@ var Location = function (data) {
             });
             marker.addListener('click', function () {
                 viewModel.openInfoWindow(self);
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-                setTimeout(function () {
-                    marker.setAnimation(null);
-                }, 1400);
+
             });
             return marker;
         }
@@ -472,6 +469,7 @@ var ViewModel = function () {
         }
     };
     this.openInfoWindow = function (location) {
+        console.log('here');
         if (!self.mapReady()) {
             self.openModal("There was an error loading Google Map. Please, try again later");
             return;
@@ -481,8 +479,15 @@ var ViewModel = function () {
             self.searchQuery(null);
         }
         self.selectedLocation(location);
+        self.animateMarker(location);
         viewMap.openInfoWindow(location);
         FoundationView.toggleMenu();
+    };
+    this.animateMarker = function (location) {
+        location.marker().setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function () {
+            location.marker().setAnimation(null);
+        }, 1400);
     };
     this.orderBy = function (order) {
         if (order.mode !== 'rating' && !self.gpsStatus()) {
