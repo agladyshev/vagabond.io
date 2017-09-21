@@ -2,6 +2,7 @@ var ViewMap = function () {
     'use strict';
     var self = this;
     this.init = function () {
+        viewModel.mapReady(true);
         var styles = [
             {
                 "featureType": "administrative",
@@ -164,6 +165,7 @@ var ViewMap = function () {
                     panoramaOptions
                 );
             } else {
+                // panorama must have a specified height, so we have to hide it
                 document.getElementById('pano').classList.toggle("infowindow-streetview");
             }
         };

@@ -94,8 +94,13 @@ var ViewModel = function () {
         {title: "Order by distance", mode: 'distance', direction: 'ASC'}
     ]);
 
+    this.mapFailure = function () {
+        self.openModal("There was an error loading Google Map. Please, try again later");
+        self.mapReady(false);
+    };
 
     this.start = function () {
+        self.mapReady = ko.observable(false);
         self.gpsStatus = ko.observable(null);
         // gpsStatus has three possible values:
         // true when set, false if there is an error, null if undefined
@@ -152,7 +157,6 @@ var ViewModel = function () {
         // If we change lists
         if (self.currentList()) {
             self.hideMarkers(self.currentList());
-
             if (localStorage[list.id]) {
                 self.initCategories = JSON.parse(localStorage[list.id]);
             }
@@ -287,6 +291,7 @@ var ViewModel = function () {
             }
         }, this);
         self.activeLocations = ko.computed(function () {
+           
             // Active locations have at least one active category
             var activeLocations = [];
             var positions = [];
@@ -295,7 +300,9 @@ var ViewModel = function () {
                     self.activeCategories().forEach(function (category) {
                         if (category.id === locationCat.id) {
                             activeLocations.push(location);
-                            positions.push(location.marker().getPosition());
+                            if (self.mapReady()) {
+                               positions.push(location.marker().getPosition());
+                            }
                         }
                     });
                 });
@@ -304,12 +311,15 @@ var ViewModel = function () {
             if (self.currentPosition()) {
                 positions.push(self.positionMarker().getPosition());
             }
-            self.markersPositions(positions);
-            // Computed observables first evaluated before map is loaded
-            if (typeof viewMap.bounds !== 'undefined') {
-                viewModel.fitBounds();
+            if (self.mapReady()) {
+                self.markersPositions(positions);
+                // Computed observables first evaluated before map is loaded
+                if (typeof viewMap.bounds !== 'undefined') {
+                    viewModel.fitBounds();
+                }
+                self.showMarkers(activeLocations);
             }
-            self.showMarkers(activeLocations);
+
             return activeLocations;
         }, this);
         self.searchResults = ko.computed(function () {
@@ -390,7 +400,9 @@ var ViewModel = function () {
     };
     this.hideMarkers = function (list) {
         list.locations().forEach(function (location) {
-            location.marker().setMap(null);
+            if (self.mapReady()) {
+                location.marker().setMap(null);
+            }
         });
         // viewMap.resetBounds();
     };
@@ -454,6 +466,10 @@ var ViewModel = function () {
         }
     };
     this.openInfoWindow = function (location) {
+        if (!self.mapReady()) {
+            self.openModal("There was an error loading Google Map. Please, try again later");
+            return;
+        }
         // Empty search query if link opened from search results
         if (self.searchQuery()) {
             self.searchQuery(null);
