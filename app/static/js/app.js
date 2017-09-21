@@ -62,8 +62,6 @@ var Location = function (data) {
             });
             marker.addListener('click', function () {
                 viewModel.openInfoWindow(self);
-            });
-            marker.addListener('click', function () {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 setTimeout(function () {
                     marker.setAnimation(null);
@@ -164,7 +162,7 @@ var ViewModel = function () {
         // Always
         self.currentList(list);
         self.getListData(list);
-        if (viewMap.geoPosition) {
+        if (self.mapReady() && viewMap.geoPosition) {
             self.getDistance();
         }
         localStorage.initList = JSON.stringify(list);
@@ -290,38 +288,6 @@ var ViewModel = function () {
                 });
             }
         }, this);
-        self.activeLocations = ko.computed(function () {
-           
-            // Active locations have at least one active category
-            var activeLocations = [];
-            var positions = [];
-            self.sortedLocations().forEach(function (location) {
-                location.categories().forEach(function (locationCat) {
-                    self.activeCategories().forEach(function (category) {
-                        if (category.id === locationCat.id) {
-                            activeLocations.push(location);
-                            if (self.mapReady()) {
-                               positions.push(location.marker().getPosition());
-                            }
-                        }
-                    });
-                });
-            });
-            // If user locations is set, add it to positions array to set new map bounds
-            if (self.currentPosition()) {
-                positions.push(self.positionMarker().getPosition());
-            }
-            if (self.mapReady()) {
-                self.markersPositions(positions);
-                // Computed observables first evaluated before map is loaded
-                if (typeof viewMap.bounds !== 'undefined') {
-                    viewModel.fitBounds();
-                }
-                self.showMarkers(activeLocations);
-            }
-
-            return activeLocations;
-        }, this);
         self.searchResults = ko.computed(function () {
             // Calculate possible locations based on user string in search
             var searchItems;
@@ -393,6 +359,47 @@ var ViewModel = function () {
                 }
             }
         });
+        self.activeLocations = ko.computed(function () {
+           
+            // Active locations have at least one active category
+            var activeLocations = [];
+            var positions = [];
+
+            if (self.searchResults()) {
+                self.searchResults().forEach(function (location) {
+                    positions.push(location.marker().getPosition());
+                    activeLocations.push(location);
+                })
+            } else {
+                self.sortedLocations().forEach(function (location) {
+                    location.categories().forEach(function (locationCat) {
+                        self.activeCategories().forEach(function (category) {
+                            if (category.id === locationCat.id) {
+                                activeLocations.push(location);
+                                if (self.mapReady()) {
+                                   positions.push(location.marker().getPosition());
+                                }
+                            }
+                        });
+                    });
+                });
+            }
+            // If user locations is set, add it to positions array to set new map bounds
+            if (self.currentPosition()) {
+                positions.push(self.positionMarker().getPosition());
+            }
+            if (self.mapReady()) {
+                self.markersPositions(positions);
+                // Computed observables first evaluated before map is loaded
+                if (typeof viewMap.bounds !== 'undefined') {
+                    viewModel.fitBounds();
+                }
+                self.showMarkers(activeLocations);
+            }
+            return activeLocations;
+            
+        }, this);
+
 
     };
     this.fitBounds = function () {
@@ -569,6 +576,8 @@ var FoundationView = {
 
 
 var viewModel = new ViewModel();
+
+
 
 // Added deferred option when infowindow updates stopped working after moving to flask
 ko.options.deferUpdates = true;
