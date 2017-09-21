@@ -443,6 +443,10 @@ var ViewModel = function () {
             location.duration(result.duration);
             location.distance(result.distance);
         }
+        // If infowindow for locations is opened, render it again to update distance value
+        if (viewMap.infowindow && viewMap.infowindow.anchor.title === location.marker().title) {
+            self.openInfoWindow(location);
+        }
     };
     this.openInfoWindow = function (location) {
         // Empty search query if link opened from search results
@@ -461,6 +465,11 @@ var ViewModel = function () {
         }
     };
     this.getDirections = function (location) {
+        // if function is called from infowindow, set location to infowindow location
+        if (!location) {
+            location = self.selectedLocation();
+        }
+        console.log(location);
         self.isLoading(true);
         if (!self.gpsStatus()) {
             self.toggleGPS();

@@ -85,6 +85,10 @@ body {
   min-height: 12rem;
 }
 
+/*.hidden {
+  display:;
+}*/
+
   @media screen and (max-width: 40em) {
     .reveal {
         left: 10vw;
