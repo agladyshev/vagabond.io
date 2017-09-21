@@ -118,6 +118,7 @@ var ViewModel = function () {
 
         self.lists = ko.observableArray([]);
         self.currentList = ko.observable();
+        self.markersPositions = ko.observableArray([]);
 
         initialLists.forEach(function (list) {
             self.lists.push(new List(list));
@@ -303,9 +304,10 @@ var ViewModel = function () {
             if (self.currentPosition()) {
                 positions.push(self.positionMarker().getPosition());
             }
+            self.markersPositions(positions);
             // Computed observables first evaluated before map is loaded
             if (typeof viewMap.bounds !== 'undefined') {
-                viewMap.fitBounds(positions);
+                viewModel.fitBounds();
             }
             self.showMarkers(activeLocations);
             return activeLocations;
@@ -382,6 +384,9 @@ var ViewModel = function () {
             }
         });
 
+    };
+    this.fitBounds = function () {
+        viewMap.fitBounds(self.markersPositions());
     };
     this.hideMarkers = function (list) {
         list.locations().forEach(function (location) {

@@ -93,6 +93,9 @@ var ViewMap = function () {
             disableDefaultUI: true
         });
         self.resetBounds();
+        google.maps.event.addDomListener(window, 'resize', function() {
+            viewModel.fitBounds();
+        });
     };
     this.resetBounds = function () {
         self.bounds = new google.maps.LatLngBounds();
