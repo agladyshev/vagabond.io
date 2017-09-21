@@ -362,7 +362,7 @@ var ViewModel = function () {
             // Active locations have at least one active category
             var activeLocations = [];
             var positions = [];
-            if (self.searchActive() || self.searchQuery()) {
+            if ((self.searchActive() || self.searchQuery()) && self.searchResults()) {
                 self.searchResults().forEach(function (location) {
                     if (location.marker()) {
                         positions.push(location.marker().getPosition());
