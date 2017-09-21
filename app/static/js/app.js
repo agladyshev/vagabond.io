@@ -102,6 +102,17 @@ var ViewModel = function () {
         self.selectedLocation = ko.observable();
         self.searchQuery = ko.observable();
         self.searchActive = ko.observable(false);
+        self.resultsVisible = ko.observable(false);
+        // Delay is set to prevent clicking on invisible element
+        self.searchActive.subscribe(function(newValue) {
+            if (!newValue) {
+                setTimeout(function () {
+                    self.resultsVisible(false);
+                }, 100);
+            } else {
+                self.resultsVisible(true);
+            }
+        });
 
         self.currentTravelMode = ko.observable(this.travelModes()[0]);
         self.currentOrder = ko.observable(this.listOrders()[0]);
@@ -469,7 +480,6 @@ var ViewModel = function () {
         }
     };
     this.openInfoWindow = function (location) {
-        console.log('here');
         if (!self.mapReady()) {
             self.openModal("There was an error loading Google Map. Please, try again later");
             return;
