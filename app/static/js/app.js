@@ -445,7 +445,7 @@ var ViewModel = function () {
         }
         // If infowindow for locations is opened, render it again to update distance value
         if (viewMap.infowindow && viewMap.infowindow.anchor.title === location.marker().title) {
-            self.openInfoWindow(location);
+            viewMap.updateInfoWindow(location);
         }
     };
     this.openInfoWindow = function (location) {
@@ -469,7 +469,6 @@ var ViewModel = function () {
         if (!location) {
             location = self.selectedLocation();
         }
-        console.log(location);
         self.isLoading(true);
         if (!self.gpsStatus()) {
             self.toggleGPS();
