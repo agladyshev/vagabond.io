@@ -92,11 +92,6 @@ var ViewModel = function () {
         {title: "Order by distance", mode: 'distance', direction: 'ASC'}
     ]);
 
-    this.mapFailure = function () {
-        self.openModal("There was an error loading Google Map. Please, try again later");
-        self.mapReady(false);
-    };
-
     this.start = function () {
         self.mapReady = ko.observable(false);
         self.gpsStatus = ko.observable(null);
@@ -109,6 +104,7 @@ var ViewModel = function () {
 
         self.selectedLocation = ko.observable();
         self.searchQuery = ko.observable();
+        self.searchActive = ko.observable(false);
 
         self.currentTravelMode = ko.observable(this.travelModes()[0]);
         self.currentOrder = ko.observable(this.listOrders()[0]);
@@ -357,6 +353,8 @@ var ViewModel = function () {
                 } else {
                     return null;
                 }
+            } else {
+                return initialLocations;
             }
         });
         self.activeLocations = ko.computed(function () {
@@ -364,10 +362,11 @@ var ViewModel = function () {
             // Active locations have at least one active category
             var activeLocations = [];
             var positions = [];
-
-            if (self.searchResults()) {
+            if (self.searchActive() || self.searchQuery()) {
                 self.searchResults().forEach(function (location) {
-                    positions.push(location.marker().getPosition());
+                    if (location.marker()) {
+                        positions.push(location.marker().getPosition());
+                    }
                     activeLocations.push(location);
                 })
             } else {
@@ -376,8 +375,8 @@ var ViewModel = function () {
                         self.activeCategories().forEach(function (category) {
                             if (category.id === locationCat.id) {
                                 activeLocations.push(location);
-                                if (self.mapReady()) {
-                                   positions.push(location.marker().getPosition());
+                                if (location.marker()) {
+                                    positions.push(location.marker().getPosition());
                                 }
                             }
                         });
@@ -388,7 +387,7 @@ var ViewModel = function () {
             if (self.currentPosition()) {
                 positions.push(self.positionMarker().getPosition());
             }
-            if (self.mapReady()) {
+            if (self.mapReady() && positions.length) {
                 self.markersPositions(positions);
                 // Computed observables first evaluated before map is loaded
                 if (typeof viewMap.bounds !== 'undefined') {
@@ -407,7 +406,7 @@ var ViewModel = function () {
     };
     this.hideMarkers = function (list) {
         list.locations().forEach(function (location) {
-            if (self.mapReady()) {
+            if (location.marker()) {
                 location.marker().setMap(null);
             }
         });
@@ -548,6 +547,13 @@ var ViewModel = function () {
         self.modalText('');
         FoundationView.toggleModal();
     };
+    this.mapFailure = function () {
+        self.openModal("There was an error loading Google Map. Please, try again later");
+        self.mapReady(false);
+    };
+    this.setMapReady = function () {
+        self.mapReady(true);
+    };
     this.start();
 };
 
@@ -576,7 +582,6 @@ var FoundationView = {
 
 
 var viewModel = new ViewModel();
-
 
 
 // Added deferred option when infowindow updates stopped working after moving to flask

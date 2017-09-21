@@ -24,7 +24,7 @@
             </div>
             <div class="cell small-7 text-right grid-x align-right align-middle">
               <div class="auto cell grid-x align-right" data-bind="visible: !shouldShowDirections()">
-                <input class="search-input cell small-auto medium-shrink" type="text" placeholder="just find a place" data-bind="textInput: searchQuery">
+                <input class="search-input cell small-auto medium-shrink" type="text" placeholder="just find a place" data-bind="textInput: searchQuery, hasFocus: searchActive">
               </div>
               <button class="cell shrink button tiny hollow secondary dynamic-content" data-bind="visible: shouldShowDirections(), click: closeDirections">Close directions</button>
               <div class="cell shrink">
@@ -32,7 +32,7 @@
               </div>
             </div>
           </div>
-          <div class="dropdown-pane search-results dynamic-content" data-bind="visible: searchQuery()">
+          <div class="dropdown-pane search-results dynamic-content" data-bind="visible: searchActive()">
             <div data-bind="foreach: searchResults()">
               <div class="grid-x">
                 <div class="auto cell">
@@ -125,7 +125,6 @@
     <script src="js/foundation/foundation.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/map.js"></script>
-    
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyCE5Awu_c3yE5qFvvT1QdjLH597d42egNQ&v=3&v=3&callback=viewMap.init" onerror="viewModel.mapFailure()">
     </script>

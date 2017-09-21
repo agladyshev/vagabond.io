@@ -2,7 +2,6 @@ var ViewMap = function () {
     'use strict';
     var self = this;
     this.init = function () {
-        viewModel.mapReady(true);
         var styles = [
             {
                 "featureType": "administrative",
@@ -86,8 +85,8 @@ var ViewMap = function () {
                 ]
             }
         ];
-
-        self.map = new google.maps.Map(document.getElementById('map'), {
+        var mapDiv = document.getElementById('map');
+        self.map = new google.maps.Map(mapDiv, {
             center: {lat: 40.179186, lng: 44.499103},
             zoom: 12,
             styles: styles,
@@ -97,6 +96,10 @@ var ViewMap = function () {
         google.maps.event.addDomListener(window, 'resize', function() {
             viewModel.fitBounds();
         });
+        google.maps.event.addDomListener(mapDiv, 'click', function() {
+            viewModel.searchActive(false);
+        });
+        viewModel.setMapReady();
     };
     this.resetBounds = function () {
         self.bounds = new google.maps.LatLngBounds();
