@@ -376,7 +376,7 @@ var ViewModel = function () {
                         positions.push(location.marker().getPosition());
                     }
                     activeLocations.push(location);
-                })
+                });
             } else {
                 self.sortedLocations().forEach(function (location) {
                     location.categories().forEach(function (locationCat) {

@@ -127,19 +127,19 @@ var ViewMap = function () {
             ' - ' + location.duration().text + '</div>' : '') + '<div class="cell grid-x button-group tiny">';
 
         location.categories().forEach(function(category) {
-            div += '<div class="cell button shrink">' + category.shortName + '</div>'
+            div += '<div class="cell button shrink">' + category.shortName + '</div>';
         });
 
         div += '</div><div class="cell infowindow-streetview" id="pano"></div>';
         
-        div += '<div class="cell grid-x button-group tiny align-center">'
+        div += '<div class="cell grid-x button-group tiny align-center">';
         if (self.geoPosition) {
-            div += '<a id="directions-button" class="fi-map cell shrink button tiny success" onclick="viewModel.getDirections()"> Get directions</a>'
+            div += '<a id="directions-button" class="fi-map cell shrink button tiny success" onclick="viewModel.getDirections()"> Get directions</a>';
         } else {
-            div += '<a id="geolocation-button" class="fi-marker cell shrink button secondary" onclick="viewModel.toggleGPS()"> Turn on geolocation</a>'
+            div += '<a id="geolocation-button" class="fi-marker cell shrink button secondary" onclick="viewModel.toggleGPS()"> Turn on geolocation</a>';
         }
 
-        div += (location.phone? '<a class="cell shrink button fi-telephone"> ' + location.phone + '</a>': '') + '</div>'
+        div += (location.phone? '<a class="cell shrink button fi-telephone"> ' + location.phone + '</a>': '') + '</div>';
 
         return div;
     };
