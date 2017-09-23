@@ -64,6 +64,10 @@ body {
   margin-bottom: 0;
 }
 
+/*.infowindow {
+  pointer-events:none;
+}*/
+
 .infowindow-streetview {
   margin: 0.2rem 0;
 }
@@ -102,13 +106,19 @@ body {
     .infowindow-streetview {
       height: 30vh;
     }
+    .dropdown-pane {
+      width: auto;
+    }
   }
   @media screen and (min-width: 40em) {
-
     .infowindow {
       width: 30rem;
     }
     .infowindow-streetview {
       height: 25rem;
+    }
+    .dropdown-pane {
+      width: auto;
+      max-width: 30rem;
     }
   }

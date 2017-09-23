@@ -96,8 +96,15 @@ var ViewMap = function () {
         google.maps.event.addDomListener(window, 'resize', function() {
             viewModel.fitBounds();
         });
-        google.maps.event.addDomListener(mapDiv, 'click', function() {
+        // google.maps.event.addDomListener(mapDiv, 'click', function() {
+        //     viewModel.searchActive(false);
+        //     // self.closeInfoWindow();
+        //     console.log('here');
+        // });
+        google.maps.event.addListener(self.map, 'click', function() {
             viewModel.searchActive(false);
+            self.closeInfoWindow();
+            console.log('there');
         });
         viewModel.setMapReady();
     };
