@@ -303,10 +303,9 @@ var ViewModel = function () {
 
                 var properties = {
                     "name": {"found": false, "matches": 0},
-                    "address": {"found": false, "matches": 0},
+                    /*"address": {"found": false, "matches": 0},*/
                     "cat": {"found": false, "matches": 0}
                 };
-
                 searchItems.forEach(function (item) {
                     // We filter results by each added substring
                     filteredLocations = [];
@@ -316,11 +315,11 @@ var ViewModel = function () {
                             properties.name.matches += 1;
                             return;
                         }
-                        if (!properties.address.found && location.address && location.address.toLowerCase().includes(item)) {
-                            filteredLocations.push(location);
-                            properties.address.matches += 1;
-                            return;
-                        }
+                        // if (!properties.address.found && location.address && location.address.toLowerCase().includes(item)) {
+                        //     filteredLocations.push(location);
+                        //     properties.address.matches += 1;
+                        //     return;
+                        // }
                         if (!properties.cat.found) {
                             location.categories().forEach(function (category) {
                                 if (category.name.toLowerCase().includes(item)) {
