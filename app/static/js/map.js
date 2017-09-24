@@ -90,17 +90,13 @@ var ViewMap = function () {
             center: {lat: 40.179186, lng: 44.499103},
             zoom: 12,
             styles: styles,
+            gestureHandling: 'greedy',
             disableDefaultUI: true
         });
         self.resetBounds();
         google.maps.event.addDomListener(window, 'resize', function() {
             viewModel.fitBounds();
         });
-        // google.maps.event.addDomListener(mapDiv, 'click', function() {
-        //     viewModel.searchActive(false);
-        //     // self.closeInfoWindow();
-        //     console.log('here');
-        // });
         google.maps.event.addListener(self.map, 'click', function() {
             viewModel.searchActive(false);
             self.closeInfoWindow();
